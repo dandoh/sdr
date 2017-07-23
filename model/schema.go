@@ -21,10 +21,10 @@ type User struct {
 
 type Group struct {
 	gorm.Model
-	Name  string `gorm:"size:255" json:"name"`
-	Users []User    `gorm:"many2many:user_group" json:"users"`
+	Name    string `gorm:"size:255" json:"name"`
+	Users   []User    `gorm:"many2many:user_group" json:"users"`
+	Reports []Report
 }
-
 
 type Report struct {
 	gorm.Model
@@ -33,6 +33,7 @@ type Report struct {
 	UserID        uint `gorm:"index"`
 	Todoes        []Todo
 	Comments      []Comment
+	GroupID       uint `gorm:"index"`
 }
 
 type Comment struct {
@@ -95,7 +96,7 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 			Description: "Which posts they have written.",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				user := p.Source.(User)
-				return getGroupsContainUser(user),nil
+				return getGroupsContainUser(user), nil
 			},
 		},
 
@@ -104,24 +105,17 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 			Description: "Which posts they have written.",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				user := p.Source.(User)
-				return getReportsOfUser(user),nil
+				return getReportsOfUser(user), nil
 			},
 		},
-
-
 		"comments": &graphql.Field{
 			Type:        graphql.NewList(commentType),
 			Description: "Which posts they have written.",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				user := p.Source.(User)
-				return getCommentsOfUser(user),nil
+				return getCommentsOfUser(user), nil
 			},
 		},
-
-
-
-
-
 		//Password and Token haven't been declared.
 	},
 })
@@ -143,26 +137,15 @@ var groupType = graphql.NewObject(graphql.ObjectConfig{
 			Description: "The group's name",
 		},
 
-		"users": &graphql.Field{
-			//Type:        graphql.NewList(userType),
-			Description: "...",
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-
-				group := p.Source.(Group)
-
-				return getUsersInGroup(group), nil
-			},
-		},
-
 	},
 })
 
 var reportType = graphql.NewObject(graphql.ObjectConfig{
-	Name: "Report",
+	Name:        "Report",
 	Description: "...",
 	Fields: graphql.Fields{
 		"id": &graphql.Field{
-			Type:      graphql.Int,
+			Type:        graphql.Int,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				report := p.Source.(Report)
@@ -171,7 +154,7 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 		"date": &graphql.Field{
-			Type:      graphql.String,
+			Type:        graphql.String,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				report := p.Source.(Report)
@@ -181,7 +164,7 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 
 
 		"summerization": &graphql.Field{
-			Type:      graphql.String,
+			Type:        graphql.String,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				report := p.Source.(Report)
@@ -200,7 +183,7 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 		"todoes": &graphql.Field{
-			Type:      graphql.NewList(todoType),
+			Type:        graphql.NewList(todoType),
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				report := p.Source.(Report)
@@ -209,26 +192,25 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 		"comments": &graphql.Field{
-			Type:      graphql.NewList(commentType),
+			Type:        graphql.NewList(commentType),
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				report := p.Source.(Report)
-				return getCommentsOfReport(report),nil
+				return getCommentsOfReport(report), nil
 			},
 		},
 
 	},
 
 
-
 })
 
 var commentType = graphql.NewObject(graphql.ObjectConfig{
-	Name: "Comment",
+	Name:        "Comment",
 	Description: "...",
 	Fields: graphql.Fields{
 		"id": &graphql.Field{
-			Type:      graphql.Int,
+			Type:        graphql.Int,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				comment := p.Source.(Comment)
@@ -237,7 +219,7 @@ var commentType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 		"user": &graphql.Field{
-//			Type:      graphql.Type(userType),
+			//			Type:      graphql.Type(userType),
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				comment := p.Source.(Comment)
@@ -246,17 +228,17 @@ var commentType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 		"report": &graphql.Field{
-//			Type:      graphql.Type(reportType),
+			//			Type:      graphql.Type(reportType),
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				comment :=p.Source.(Comment)
+				comment := p.Source.(Comment)
 				return getReportById(comment.ReportID), nil
 			},
 		},
 
 
 		"date": &graphql.Field{
-			Type:      graphql.String,
+			Type:        graphql.String,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				date := p.Source.(Comment)
@@ -266,7 +248,7 @@ var commentType = graphql.NewObject(graphql.ObjectConfig{
 
 
 		"content": &graphql.Field{
-			Type:      graphql.String,
+			Type:        graphql.String,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				date := p.Source.(Comment)
@@ -281,11 +263,11 @@ var commentType = graphql.NewObject(graphql.ObjectConfig{
 })
 
 var todoType = graphql.NewObject(graphql.ObjectConfig{
-	Name: "Todo",
-	Description:"...",
+	Name:        "Todo",
+	Description: "...",
 	Fields: graphql.Fields{
 		"id": &graphql.Field{
-			Type:      graphql.Int,
+			Type:        graphql.Int,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				todo := p.Source.(Todo)
@@ -294,7 +276,7 @@ var todoType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 		"content": &graphql.Field{
-			Type:      graphql.String,
+			Type:        graphql.String,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				todo := p.Source.(Todo)
@@ -303,7 +285,7 @@ var todoType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 		"status": &graphql.Field{
-			Type:      graphql.String,
+			Type:        graphql.String,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				todo := p.Source.(Todo)
@@ -312,7 +294,7 @@ var todoType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 		"report": &graphql.Field{
-			Type:      graphql.String,
+			Type:        graphql.String,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				todo := p.Source.(Todo)
@@ -321,16 +303,9 @@ var todoType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 
-
-
-
-
-
 	},
 
 })
-
-
 
 var queryType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "RootQuery",
@@ -352,6 +327,8 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				return Group{}, nil
 			},
 		},
+
+
 	},
 })
 
@@ -360,12 +337,14 @@ var SchemaQL, _ = graphql.NewSchema(graphql.SchemaConfig{
 })
 
 func InitType() {
-	groupType.AddFieldConfig("users", &graphql.Field{Type: graphql.NewList(userType),Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+	groupType.AddFieldConfig("users",
+		&graphql.Field{Type: graphql.NewList(userType),
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				group := p.Source.(Group)
+				return getUsersInGroup(group), nil
+			}, })
 
-	group := p.Source.(Group)
-
-	return getUsersInGroup(group), nil
-	},})
+	// TODO
 	reportType.AddFieldConfig("user", &graphql.Field{Type: userType})
 	commentType.AddFieldConfig("user", &graphql.Field{Type: userType})
 	commentType.AddFieldConfig("report", &graphql.Field{Type: reportType})

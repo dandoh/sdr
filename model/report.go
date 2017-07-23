@@ -3,14 +3,14 @@ package model
 
 func getTodoesOfReport(report Report) []Todo{
 	var todoes []Todo
-	db.Model(&report).Association("Todo").Find(&todoes)
+	db.Model(&report).Association("Todoes").Find(&todoes)
 	return todoes
 }
 
 
 func getCommentsOfReport(report Report) []Comment{
 	var comments []Comment
-	db.Model(&report).Association("Comment").Find(&comments)
+	db.Model(&report).Association("Comments").Find(&comments)
 	return comments
 }
 
