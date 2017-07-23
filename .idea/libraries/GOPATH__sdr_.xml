@@ -1,20 +1,28 @@
 <component name="libraryTable">
   <library name="GOPATH &lt;sdr&gt;">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../playground" />
-      <root url="file://$PROJECT_DIR$/../gopkg.in" />
+      <root url="file://$PROJECT_DIR$/../server" />
+      <root url="file://$PROJECT_DIR$/../gorm_play" />
+      <root url="file://$PROJECT_DIR$/../Go-Signup-Login-Example-MySQL" />
+      <root url="file://$PROJECT_DIR$/../grapthql_playground" />
+      <root url="file://$PROJECT_DIR$/../database" />
       <root url="file://$PROJECT_DIR$/../github.com" />
       <root url="file://$PROJECT_DIR$/../golang.org" />
-      <root url="file://$PROJECT_DIR$/../google.golang.org" />
-      <root url="file://$PROJECT_DIR$/../demo" />
+      <root url="file://$PROJECT_DIR$/../project" />
+      <root url="file://$PROJECT_DIR$/../project.store" />
+      <root url="file://$PROJECT_DIR$/../go-echo-vue" />
     </CLASSES>
     <SOURCES>
-      <root url="file://$PROJECT_DIR$/../playground" />
-      <root url="file://$PROJECT_DIR$/../gopkg.in" />
+      <root url="file://$PROJECT_DIR$/../server" />
+      <root url="file://$PROJECT_DIR$/../gorm_play" />
+      <root url="file://$PROJECT_DIR$/../Go-Signup-Login-Example-MySQL" />
+      <root url="file://$PROJECT_DIR$/../grapthql_playground" />
+      <root url="file://$PROJECT_DIR$/../database" />
       <root url="file://$PROJECT_DIR$/../github.com" />
       <root url="file://$PROJECT_DIR$/../golang.org" />
-      <root url="file://$PROJECT_DIR$/../google.golang.org" />
-      <root url="file://$PROJECT_DIR$/../demo" />
+      <root url="file://$PROJECT_DIR$/../project" />
+      <root url="file://$PROJECT_DIR$/../project.store" />
+      <root url="file://$PROJECT_DIR$/../go-echo-vue" />
     </SOURCES>
     <excluded>
       <root url="file://$PROJECT_DIR$" />

@@ -5,11 +5,18 @@ import (
 	"sdr/model"
 	"github.com/graphql-go/handler"
 	"net/http"
+	_"fmt"
 )
+
+
+
+
 
 func main() {
 	// initialize database
 	model.Init();
+	model.InitType();
+
 	h := handler.New(&handler.Config{
 		Schema: &model.SchemaQL,
 		Pretty: true,
