@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	DB_USER     = "Dandoh"
-	DB_PASSWORD = "dandoh"
-	DB_NAME     = "sdr_gorm"
+	DB_USER     = "postgres"
+	DB_PASSWORD = "123456789"
+	DB_NAME     = "Scoville_Info"
 )
 
 var db *gorm.DB
@@ -55,13 +55,41 @@ func Init() {
 		db.Create(&group2)
 		db.Create(&group3)
 
+		report1 := Report{
+			Summerization: "This is summerization of report 1",
+			UserID:user1.ID,
+			GroupID:group1.ID,
+		}
+		report2 := Report{
+			Summerization: "This is summerization of report 2",
+			UserID:user2.ID,
+			GroupID:group1.ID,
+		}
+		//report3 := Report{Summerization: "This is summerization of report 3"}
+
+
 		db.Model(&user1).Association("Groups").Append(group1)
 		db.Model(&user1).Association("Groups").Append(group3)
 		db.Model(&user1).Association("Groups").Append(group2)
 		db.Model(&user2).Association("Groups").Append(group3)
+		db.Model(&user2).Association("Groups").Append(group1)
 		db.Model(&user3).Association("Groups").Append(group1)
 		db.Model(&user3).Association("Groups").Append(group2)
 
+		//fmt.Printf("\n%+v\n", report1)
+		//db.Create(&report1)
+		//fmt.Printf("\n%+v\n", report1)
+		//db.Model(&user1).Association("Reports").Append(report1)
+		//db.Model(&group1).Association("Reports").Append(report1)
+		//
+		//db.Create(&report2)
+		//db.Model(&user2).Association("Reports").Append(report2)
+		//db.Model(&group1).Association("Reports").Append(report2)
+
+		//fmt.Printf("\n%+v\n", report1)
+
+		db.Create(&report1)
+		db.Create(&report2)
 	}
 
 }

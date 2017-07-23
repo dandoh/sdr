@@ -18,8 +18,15 @@ func getCommentsOfUser(user User) []Comment{
 	return comments
 }
 
-func getUserById(id uint) User{
+func getUserById(id int) User{
 	var user User
 	db.First(&user, id)
 	return user
+}
+
+func getGroupsByUserId(id int) []Group{
+	var groups []Group
+	var user User = getUserById(id)
+	db.Model(&user).Association("Groups").Find(&groups)
+	return groups
 }

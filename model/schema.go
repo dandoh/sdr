@@ -173,14 +173,7 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 
-		"user": &graphql.Field{
-			//Type:      graphql.Type(userType),
-			Description: "...",
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				report := p.Source.(Report)
-				return getUserById(report.UserID), nil
-			},
-		},
+
 
 		"todoes": &graphql.Field{
 			Type:        graphql.NewList(todoType),
@@ -223,7 +216,7 @@ var commentType = graphql.NewObject(graphql.ObjectConfig{
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				comment := p.Source.(Comment)
-				return getUserById(comment.UserID), nil
+				return getUserById(int(comment.UserID)), nil
 			},
 		},
 
@@ -328,6 +321,45 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 
+		"getReportsByGroupId": &graphql.Field{
+			Type: graphql.NewList(reportType),
+			Args: graphql.FieldConfigArgument{
+				"id": &graphql.ArgumentConfig{
+					Type:        graphql.Int,
+					Description: "...",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				idQuery, isOK := p.Args["id"].(int)
+				if isOK {
+					return getReportsByGroupId(idQuery), nil
+				}
+
+				return Group{}, nil
+			},
+
+		},
+
+		"getGroupsByUserId": &graphql.Field{
+			Type: graphql.NewList(groupType),
+			Args: graphql.FieldConfigArgument{
+				"id": &graphql.ArgumentConfig{
+					Type:        graphql.Int,
+					Description: "...",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				idQuery, isOK := p.Args["id"].(int)
+				if isOK {
+					return getGroupsByUserId(idQuery), nil
+				}
+
+				return Group{}, nil
+			},
+
+		},
+
+
 
 	},
 })
@@ -345,7 +377,26 @@ func InitType() {
 			}, })
 
 	// TODO
-	reportType.AddFieldConfig("user", &graphql.Field{Type: userType})
+	reportType.AddFieldConfig("user",
+		&graphql.Field{Type: userType,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				report := p.Source.(Report)
+				return getUserById(int(report.UserID)), nil
+			},
+
+
+		},)
+
+	reportType.AddFieldConfig("group",
+		&graphql.Field{Type: groupType,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				report := p.Source.(Report)
+				return getGroupById(int(report.GroupID)	), nil
+			},
+
+
+		},)
+
 	commentType.AddFieldConfig("user", &graphql.Field{Type: userType})
 	commentType.AddFieldConfig("report", &graphql.Field{Type: reportType})
 }
