@@ -24,9 +24,32 @@ func getUserById(id int) User{
 	return user
 }
 
+func getUserByEmail(email string) User{
+	var user User
+	db.Where("email = ?",email).First(&user)
+	return user
+}
+
 func getGroupsByUserId(id int) []Group{
 	var groups []Group
 	var user User = getUserById(id)
 	db.Model(&user).Association("Groups").Find(&groups)
 	return groups
+}
+
+func isEmailExisted(email string) bool{
+	var user User
+	var count int
+	db.Where("email = ?",email).Find(&user).Count(&count)
+	if (count > 0){
+		return true
+	}
+	return false
+}
+
+
+func createAccount(name string, password string, email string) bool{
+	var user User = User{Name:name, PasswordMD5:password, Email:email}
+	db.Create(&user)
+	return true
 }

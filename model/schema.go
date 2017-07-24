@@ -5,6 +5,8 @@ import (
 	"time"
 	"github.com/graphql-go/graphql"
 	_"fmt"
+	_"container/list"
+	_"github.com/labstack/gommon/email"
 )
 
 type User struct {
@@ -47,7 +49,7 @@ type Comment struct {
 type Todo struct {
 	gorm.Model
 	Content  string
-	Status   uint
+	Status   string
 	ReportID uint `gorm:"index"`
 }
 
@@ -137,6 +139,15 @@ var groupType = graphql.NewObject(graphql.ObjectConfig{
 			Description: "The group's name",
 		},
 
+		"reports": &graphql.Field{
+			Type:        graphql.NewList(reportType),
+			Description: "Which posts they have written.",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				group := p.Source.(Group)
+				return getReportsByGroupId(int(group.ID)), nil
+			},
+		},
+
 	},
 })
 
@@ -171,8 +182,6 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 				return report.Summerization, nil
 			},
 		},
-
-
 
 
 		"todoes": &graphql.Field{
@@ -359,13 +368,115 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 
 		},
 
+		"getUsersByGroupId": &graphql.Field{
+			Type: graphql.NewList(userType),
+			Args: graphql.FieldConfigArgument{
+				"id": &graphql.ArgumentConfig{
+					Type:        graphql.Int,
+					Description: "...",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				idQuery, isOK := p.Args["id"].(int)
+				if isOK {
+					return getUsersByGroupId(idQuery), nil
+				}
+
+				return User{}, nil
+			},
+
+		},
+
+
+	},
+})
+
+var mutateType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "RootMutex",
+	Fields: graphql.Fields{
+		"createAccount": &graphql.Field{
+			Type: graphql.Boolean,
+			Args: graphql.FieldConfigArgument{
+				"name": &graphql.ArgumentConfig{
+					Type: graphql.NewNonNull(graphql.String),
+				},
+				"password": &graphql.ArgumentConfig{
+					Type: graphql.NewNonNull(graphql.String),
+				},
+				"email": &graphql.ArgumentConfig{
+					Type: graphql.NewNonNull(graphql.String),
+				},
+			},
+
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				name := p.Args["name"].(string)
+				password := p.Args["password"].(string)
+				email := p.Args["email"].(string)
+				if !isEmailExisted(email) {
+					return createAccount(name, password, email), nil
+				}
+				return false, nil
+
+			},
+
+		},
+		"createGroup": &graphql.Field{
+			Type: graphql.Boolean,
+			Args: graphql.FieldConfigArgument{
+				"name": &graphql.ArgumentConfig{
+					Type: graphql.NewNonNull(graphql.String),
+				},
+			},
+
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				name := p.Args["name"].(string)
+				if !isNameGroupExisted(name) {
+					return createGroup(name), nil
+				}
+				return false, nil
+
+			},
+		},
+
+		"addUsersToGroup": &graphql.Field{
+			Type: graphql.Boolean,
+			Args: graphql.FieldConfigArgument{
+				"emails": &graphql.ArgumentConfig{
+					Type: graphql.NewList(graphql.String),
+				},
+
+				"groupName": &graphql.ArgumentConfig{
+					Type: graphql.String,
+				},
+			},
+
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				emailsArgs := p.Args["emails"].([]interface{})
+				emails := make([]string, len(emailsArgs))
+
+				for i := range emails {
+					emails[i] = emailsArgs[i].(string)
+				}
+
+				groupName := p.Args["groupName"].(string)
+				for _, email := range emails {
+					addUserToGroup(email, groupName)
+				}
+
+				//fmt.Print(emails)
+				return true, nil
+
+			},
+
+		},
 
 
 	},
 })
 
 var SchemaQL, _ = graphql.NewSchema(graphql.SchemaConfig{
-	Query: queryType,
+	Query:    queryType,
+	Mutation: mutateType,
 })
 
 func InitType() {
@@ -385,17 +496,17 @@ func InitType() {
 			},
 
 
-		},)
+		}, )
 
 	reportType.AddFieldConfig("group",
 		&graphql.Field{Type: groupType,
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				report := p.Source.(Report)
-				return getGroupById(int(report.GroupID)	), nil
+				return getGroupById(int(report.GroupID)), nil
 			},
 
 
-		},)
+		}, )
 
 	commentType.AddFieldConfig("user", &graphql.Field{Type: userType})
 	commentType.AddFieldConfig("report", &graphql.Field{Type: reportType})
