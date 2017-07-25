@@ -136,6 +136,10 @@ var groupType = graphql.NewObject(graphql.ObjectConfig{
 		"name": &graphql.Field{
 			Type:        graphql.String,
 			Description: "The group's name",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				group := p.Source.(Group)
+				return group.Name, nil
+			},
 		},
 
 		"reports": &graphql.Field{
@@ -221,7 +225,7 @@ var commentType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 		"user": &graphql.Field{
-			//			Type:      graphql.Type(userType),
+			Type:      graphql.Type(userType),
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				comment := p.Source.(Comment)
@@ -316,90 +320,90 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				idQuery, isOK := p.Args["id"].(int)
-				if isOK {
-					return getGroupById(idQuery), nil
-				}
+				//idQuery, isOK := p.Args["id"].(int)
+				//if isOK {
+				//	return Group{}, nil
+				//}
 
 				return Group{}, nil
 			},
 		},
 
-		"getReportsByGroupId": &graphql.Field{
-			Type: graphql.NewList(reportType),
-			Args: graphql.FieldConfigArgument{
-				"id": &graphql.ArgumentConfig{
-					Type:        graphql.Int,
-					Description: "...",
-				},
-			},
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				idQuery, isOK := p.Args["id"].(int)
-				if isOK {
-					return getReportsByGroupId(idQuery), nil
-				}
-
-				return Group{}, nil
-			},
-
-		},
-
-		"getReportsByGroupName": &graphql.Field{
-			Type: graphql.NewList(reportType),
-			Args: graphql.FieldConfigArgument{
-				"name": &graphql.ArgumentConfig{
-					Type:        graphql.String,
-					Description: "...",
-				},
-			},
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				idQuery, isOK := p.Args["name"].(string)
-				if isOK {
-					return getReportsByGroupName(idQuery), nil
-				}
-
-				return Group{}, nil
-			},
-
-		},
-
-		"getGroupsByUserId": &graphql.Field{
-			Type: graphql.NewList(groupType),
-			Args: graphql.FieldConfigArgument{
-				"id": &graphql.ArgumentConfig{
-					Type:        graphql.Int,
-					Description: "...",
-				},
-			},
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				idQuery, isOK := p.Args["id"].(int)
-				if isOK {
-					return getGroupsByUserId(idQuery), nil
-				}
-
-				return Group{}, nil
-			},
-
-		},
-
-		"getUsersByGroupId": &graphql.Field{
-			Type: graphql.NewList(userType),
-			Args: graphql.FieldConfigArgument{
-				"id": &graphql.ArgumentConfig{
-					Type:        graphql.Int,
-					Description: "...",
-				},
-			},
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				idQuery, isOK := p.Args["id"].(int)
-				if isOK {
-					return getUsersByGroupId(idQuery), nil
-				}
-
-				return User{}, nil
-			},
-
-		},
+		//"getReportsByGroupId": &graphql.Field{
+		//	Type: graphql.NewList(reportType),
+		//	Args: graphql.FieldConfigArgument{
+		//		"id": &graphql.ArgumentConfig{
+		//			Type:        graphql.Int,
+		//			Description: "...",
+		//		},
+		//	},
+		//	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+		//		idQuery, isOK := p.Args["id"].(int)
+		//		if isOK {
+		//			return getReportsByGroupId(idQuery), nil
+		//		}
+		//
+		//		return Group{}, nil
+		//	},
+		//
+		//},
+		//
+		//"getReportsByGroupName": &graphql.Field{
+		//	Type: graphql.NewList(reportType),
+		//	Args: graphql.FieldConfigArgument{
+		//		"name": &graphql.ArgumentConfig{
+		//			Type:        graphql.String,
+		//			Description: "...",
+		//		},
+		//	},
+		//	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+		//		idQuery, isOK := p.Args["name"].(string)
+		//		if isOK {
+		//			return getReportsByGroupName(idQuery), nil
+		//		}
+		//
+		//		return Group{}, nil
+		//	},
+		//
+		//},
+		//
+		//"getGroupsByUserId": &graphql.Field{
+		//	Type: graphql.NewList(groupType),
+		//	Args: graphql.FieldConfigArgument{
+		//		"id": &graphql.ArgumentConfig{
+		//			Type:        graphql.Int,
+		//			Description: "...",
+		//		},
+		//	},
+		//	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+		//		idQuery, isOK := p.Args["id"].(int)
+		//		if isOK {
+		//			return getGroupsByUserId(idQuery), nil
+		//		}
+		//
+		//		return Group{}, nil
+		//	},
+		//
+		//},
+		//
+		//"getUsersByGroupId": &graphql.Field{
+		//	Type: graphql.NewList(userType),
+		//	Args: graphql.FieldConfigArgument{
+		//		"id": &graphql.ArgumentConfig{
+		//			Type:        graphql.Int,
+		//			Description: "...",
+		//		},
+		//	},
+		//	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+		//		idQuery, isOK := p.Args["id"].(int)
+		//		if isOK {
+		//			return getUsersByGroupId(idQuery), nil
+		//		}
+		//
+		//		return User{}, nil
+		//	},
+		//
+		//},
 
 
 	},
