@@ -32,7 +32,7 @@ type Report struct {
 	gorm.Model
 	Summerization string `gorm:"size:1000"`
 	UserID        uint `gorm:"index"`
-	Status 		  string
+	Status        string
 	Todoes        []Todo
 	Comments      []Comment
 	GroupID       uint `gorm:"index"`
@@ -48,7 +48,7 @@ type Comment struct {
 type Todo struct {
 	gorm.Model
 	Content  string
-	State   bool
+	State    bool
 	ReportID uint `gorm:"index"`
 }
 
@@ -168,7 +168,6 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 
-
 		"status": &graphql.Field{
 			Type:        graphql.String,
 			Description: "...",
@@ -224,28 +223,6 @@ var commentType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 
-		"user": &graphql.Field{
-			Type:      graphql.Type(userType),
-			Description: "...",
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				comment := p.Source.(Comment)
-				return getUserById(int(comment.UserID)), nil
-			},
-		},
-
-		"report": &graphql.Field{
-			//			Type:      graphql.Type(reportType),
-			Description: "...",
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				comment := p.Source.(Comment)
-				return getReportById(comment.ReportID), nil
-			},
-		},
-
-
-
-
-
 		"content": &graphql.Field{
 			Type:        graphql.String,
 			Description: "...",
@@ -294,16 +271,6 @@ var todoType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 
-		"report": &graphql.Field{
-			Type:        graphql.String,
-			Description: "...",
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				todo := p.Source.(Todo)
-				return getReportById(todo.ReportID), nil
-			},
-		},
-
-
 	},
 
 })
@@ -320,91 +287,89 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				//idQuery, isOK := p.Args["id"].(int)
-				//if isOK {
-				//	return Group{}, nil
-				//}
-
+				idQuery, isOK := p.Args["id"].(int)
+				if isOK {
+					return getGroupById(idQuery), nil
+				}
 				return Group{}, nil
 			},
 		},
 
-		//"getReportsByGroupId": &graphql.Field{
-		//	Type: graphql.NewList(reportType),
-		//	Args: graphql.FieldConfigArgument{
-		//		"id": &graphql.ArgumentConfig{
-		//			Type:        graphql.Int,
-		//			Description: "...",
-		//		},
-		//	},
-		//	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-		//		idQuery, isOK := p.Args["id"].(int)
-		//		if isOK {
-		//			return getReportsByGroupId(idQuery), nil
-		//		}
-		//
-		//		return Group{}, nil
-		//	},
-		//
-		//},
-		//
-		//"getReportsByGroupName": &graphql.Field{
-		//	Type: graphql.NewList(reportType),
-		//	Args: graphql.FieldConfigArgument{
-		//		"name": &graphql.ArgumentConfig{
-		//			Type:        graphql.String,
-		//			Description: "...",
-		//		},
-		//	},
-		//	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-		//		idQuery, isOK := p.Args["name"].(string)
-		//		if isOK {
-		//			return getReportsByGroupName(idQuery), nil
-		//		}
-		//
-		//		return Group{}, nil
-		//	},
-		//
-		//},
-		//
-		//"getGroupsByUserId": &graphql.Field{
-		//	Type: graphql.NewList(groupType),
-		//	Args: graphql.FieldConfigArgument{
-		//		"id": &graphql.ArgumentConfig{
-		//			Type:        graphql.Int,
-		//			Description: "...",
-		//		},
-		//	},
-		//	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-		//		idQuery, isOK := p.Args["id"].(int)
-		//		if isOK {
-		//			return getGroupsByUserId(idQuery), nil
-		//		}
-		//
-		//		return Group{}, nil
-		//	},
-		//
-		//},
-		//
-		//"getUsersByGroupId": &graphql.Field{
-		//	Type: graphql.NewList(userType),
-		//	Args: graphql.FieldConfigArgument{
-		//		"id": &graphql.ArgumentConfig{
-		//			Type:        graphql.Int,
-		//			Description: "...",
-		//		},
-		//	},
-		//	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-		//		idQuery, isOK := p.Args["id"].(int)
-		//		if isOK {
-		//			return getUsersByGroupId(idQuery), nil
-		//		}
-		//
-		//		return User{}, nil
-		//	},
-		//
-		//},
+		"getReportsByGroupId": &graphql.Field{
+			Type: graphql.NewList(reportType),
+			Args: graphql.FieldConfigArgument{
+				"id": &graphql.ArgumentConfig{
+					Type:        graphql.Int,
+					Description: "...",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				idQuery, isOK := p.Args["id"].(int)
+				if isOK {
+					return getReportsByGroupId(idQuery), nil
+				}
 
+				return Group{}, nil
+			},
+
+		},
+
+		"getReportsByGroupName": &graphql.Field{
+			Type: graphql.NewList(reportType),
+			Args: graphql.FieldConfigArgument{
+				"name": &graphql.ArgumentConfig{
+					Type:        graphql.String,
+					Description: "...",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				idQuery, isOK := p.Args["name"].(string)
+				if isOK {
+					return getReportsByGroupName(idQuery), nil
+				}
+
+				return Group{}, nil
+			},
+
+		},
+
+		"getGroupsByUserId": &graphql.Field{
+			Type: graphql.NewList(groupType),
+			Args: graphql.FieldConfigArgument{
+				"id": &graphql.ArgumentConfig{
+					Type:        graphql.Int,
+					Description: "...",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				idQuery, isOK := p.Args["id"].(int)
+				if isOK {
+					return getGroupsByUserId(idQuery), nil
+				}
+
+				return Group{}, nil
+			},
+
+		},
+
+		"getUsersByGroupId": &graphql.Field{
+			Type: graphql.NewList(userType),
+			Args: graphql.FieldConfigArgument{
+				"id": &graphql.ArgumentConfig{
+					Type:        graphql.Int,
+					Description: "...",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				idQuery, isOK := p.Args["id"].(int)
+				if isOK {
+					return getUsersByGroupId(idQuery), nil
+				}
+
+				return User{}, nil
+			},
+
+		},
 
 	},
 })
@@ -486,7 +451,7 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 			},
 
 		},
-		"updateNoteForUser":  &graphql.Field{
+		"updateNoteForUser": &graphql.Field{
 			Type: graphql.Boolean,
 			Args: graphql.FieldConfigArgument{
 				"note": &graphql.ArgumentConfig{
@@ -527,7 +492,6 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 			},
 
 
-
 		},
 		"createReport": &graphql.Field{
 			Type: graphql.Boolean,
@@ -537,20 +501,20 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				},
 
 				"states": &graphql.ArgumentConfig{
-					Type : graphql.NewList(graphql.Boolean),
+					Type: graphql.NewList(graphql.Boolean),
 				},
 
 				"summerization": &graphql.ArgumentConfig{
-					Type : graphql.String,
+					Type: graphql.String,
 				},
 
 
 				"userEmail": &graphql.ArgumentConfig{
-					Type : graphql.String,
+					Type: graphql.String,
 				},
 
 				"nameGroup": &graphql.ArgumentConfig{
-					Type : graphql.String,
+					Type: graphql.String,
 				},
 			},
 
@@ -572,12 +536,9 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				nameGroup := p.Args["nameGroup"].(string)
 				summerization := p.Args["summerization"].(string)
 
-
 				return CreateReport(contentTodoes, states, summerization, userEmail, nameGroup), nil
 			},
 		},
-
-
 
 
 	},
@@ -617,6 +578,20 @@ func InitType() {
 
 		}, )
 
-	commentType.AddFieldConfig("user", &graphql.Field{Type: userType})
-	commentType.AddFieldConfig("report", &graphql.Field{Type: reportType})
+	commentType.AddFieldConfig("user", &graphql.Field{
+		Type:        graphql.Type(reportType),
+		Description: "...",
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			comment := p.Source.(Comment)
+			return getReportById(comment.ReportID), nil
+		},
+	});
+	commentType.AddFieldConfig("report", &graphql.Field{
+		Type:        reportType,
+		Description: "...",
+		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+			todo := p.Source.(Todo)
+			return getReportById(todo.ReportID), nil
+		},
+	})
 }
