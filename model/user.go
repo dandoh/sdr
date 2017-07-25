@@ -53,3 +53,9 @@ func createAccount(name string, password string, email string) bool{
 	db.Create(&user)
 	return true
 }
+
+func updateNoteForUser(note string, userId int) bool{
+	user := getUserById(userId)
+	db.Model(&user).Update("note", note)
+	return true
+}

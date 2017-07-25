@@ -79,7 +79,7 @@ func Init() {
 		db.Model(&user3).Association("Groups").Append(group2)
 
 		Todo1 := Todo{
-			Status: "This is todo1",
+			State: true,
 			Content:" Content todo1",
 			ReportID: report1.ID,
 		}

@@ -26,6 +26,13 @@ func getReportsByGroupId(id int) []Report{
 	return reports
 }
 
+func getReportsByGroupName(name string) []Report{
+	var reports []Report
+	var group Group = getGroupByName(name)
+	db.Model(&group).Association("Reports").Find(&reports)
+	return reports
+}
+
 func isNameGroupExisted(name string) bool{
 	var group Group
 	var count int
@@ -53,3 +60,11 @@ func addUserToGroup(email string, name_group string) bool{
 	db.Model(&user).Association("Groups").Append(group)
 	return true;
 }
+
+func deleteUserInGroup(emailUser string, nameGroup string) bool{
+	user := getUserByEmail(emailUser)
+	group := getGroupByName(nameGroup)
+	db.Model(&user).Association("Groups").Delete(group)
+	return true
+}
+

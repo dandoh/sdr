@@ -173,8 +173,11 @@ func executeQuery(query string, schema graphql.Schema) *graphql.Result {
 func main() {
 
 	http.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
-		result := executeQuery(r.URL.Query()["query"][0], schema)
-		json.NewEncoder(w).Encode(result)
+		var token string = r.URL.Query()["token"][0]
+		if(token == "vuthede") {
+			result := executeQuery(r.URL.Query()["query"][0], schema)
+			json.NewEncoder(w).Encode(result)
+		}
 	})
 
 	fmt.Println("Now server is running on port 8080")

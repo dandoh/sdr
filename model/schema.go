@@ -2,7 +2,7 @@ package model
 
 import (
 	"github.com/jinzhu/gorm"
-	"time"
+	_"time"
 	"github.com/graphql-go/graphql"
 	_"fmt"
 	_"container/list"
@@ -30,9 +30,9 @@ type Group struct {
 
 type Report struct {
 	gorm.Model
-	Date          time.Time
 	Summerization string `gorm:"size:1000"`
 	UserID        uint `gorm:"index"`
+	Status 		  string
 	Todoes        []Todo
 	Comments      []Comment
 	GroupID       uint `gorm:"index"`
@@ -42,14 +42,13 @@ type Comment struct {
 	gorm.Model
 	UserID   uint `gorm:"index"`
 	ReportID uint `gorm:"index"`
-	Date     time.Time `json:"date" json:"date"`
 	Content  string `json:"content" `
 }
 
 type Todo struct {
 	gorm.Model
 	Content  string
-	Status   string
+	State   bool
 	ReportID uint `gorm:"index"`
 }
 
@@ -164,15 +163,16 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 
-		"date": &graphql.Field{
+
+
+		"status": &graphql.Field{
 			Type:        graphql.String,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				report := p.Source.(Report)
-				return report.Date.String(), nil
+				return report.Status, nil
 			},
 		},
-
 
 		"summerization": &graphql.Field{
 			Type:        graphql.String,
@@ -239,22 +239,15 @@ var commentType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 
-		"date": &graphql.Field{
-			Type:        graphql.String,
-			Description: "...",
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				date := p.Source.(Comment)
-				return date.Date.String(), nil
-			},
-		},
+
 
 
 		"content": &graphql.Field{
 			Type:        graphql.String,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				date := p.Source.(Comment)
-				return date.Content, nil
+				comment := p.Source.(Comment)
+				return comment.Content, nil
 			},
 		},
 
@@ -286,14 +279,16 @@ var todoType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 
-		"status": &graphql.Field{
-			Type:        graphql.String,
+
+		"state": &graphql.Field{
+			Type:        graphql.Boolean,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				todo := p.Source.(Todo)
-				return todo.Status, nil
+				return todo.State, nil
 			},
 		},
+
 
 		"report": &graphql.Field{
 			Type:        graphql.String,
@@ -342,6 +337,25 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				idQuery, isOK := p.Args["id"].(int)
 				if isOK {
 					return getReportsByGroupId(idQuery), nil
+				}
+
+				return Group{}, nil
+			},
+
+		},
+
+		"getReportsByGroupName": &graphql.Field{
+			Type: graphql.NewList(reportType),
+			Args: graphql.FieldConfigArgument{
+				"name": &graphql.ArgumentConfig{
+					Type:        graphql.String,
+					Description: "...",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				idQuery, isOK := p.Args["name"].(string)
+				if isOK {
+					return getReportsByGroupName(idQuery), nil
 				}
 
 				return Group{}, nil
@@ -437,7 +451,6 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 
 			},
 		},
-
 		"addUsersToGroup": &graphql.Field{
 			Type: graphql.Boolean,
 			Args: graphql.FieldConfigArgument{
@@ -469,6 +482,98 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 			},
 
 		},
+		"updateNoteForUser":  &graphql.Field{
+			Type: graphql.Boolean,
+			Args: graphql.FieldConfigArgument{
+				"note": &graphql.ArgumentConfig{
+					Type: graphql.String,
+				},
+
+				"userId": &graphql.ArgumentConfig{
+					Type: graphql.Int,
+				},
+			},
+
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				note := p.Args["note"].(string)
+				userId := p.Args["userId"].(int)
+				return updateNoteForUser(note, userId), nil
+
+			},
+		},
+		"deleteUserInGroup": &graphql.Field{
+			Type: graphql.Boolean,
+			Args: graphql.FieldConfigArgument{
+				"userEmail": &graphql.ArgumentConfig{
+					Type: graphql.String,
+				},
+
+				"groupName": &graphql.ArgumentConfig{
+					Type: graphql.String,
+				},
+			},
+
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				email := p.Args["userEmail"].(string)
+				name := p.Args["groupName"].(string)
+
+				//deleteUserInGroup haven't been implemented yet!!!
+				return deleteUserInGroup(email, name), nil
+
+			},
+
+
+
+		},
+		"createReport": &graphql.Field{
+			Type: graphql.Boolean,
+			Args: graphql.FieldConfigArgument{
+				"contentTodoes": &graphql.ArgumentConfig{
+					Type: graphql.NewList(graphql.String),
+				},
+
+				"states": &graphql.ArgumentConfig{
+					Type : graphql.NewList(graphql.Boolean),
+				},
+
+				"summerization": &graphql.ArgumentConfig{
+					Type : graphql.String,
+				},
+
+
+				"userEmail": &graphql.ArgumentConfig{
+					Type : graphql.String,
+				},
+
+				"nameGroup": &graphql.ArgumentConfig{
+					Type : graphql.String,
+				},
+			},
+
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				contentTodoesArgs := p.Args["contentTodoes"].([]interface{})
+				statesArgs := p.Args["states"].([]interface{})
+				contentTodoes := make([]string, len(contentTodoesArgs))
+				states := make([]bool, len(statesArgs))
+
+				for i := range contentTodoes {
+					contentTodoes[i] = contentTodoesArgs[i].(string)
+				}
+
+				for i := range states {
+					states[i] = statesArgs[i].(bool)
+				}
+
+				userEmail := p.Args["userEmail"].(string)
+				nameGroup := p.Args["nameGroup"].(string)
+				summerization := p.Args["summerization"].(string)
+
+
+				return CreateReport(contentTodoes, states, summerization, userEmail, nameGroup), nil
+			},
+		},
+
+
 
 
 	},
