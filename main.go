@@ -9,32 +9,24 @@ import (
 	_"github.com/rs/cors"
 	"github.com/graphql-go/graphql"
 	_"encoding/json"
-	 _"github.com/dgrijalva/jwt-go"
+	_"github.com/dgrijalva/jwt-go"
 	_"github.com/graphql-go/graphql"
 	_"github.com/graphql-go/handler"
 	_"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"encoding/json"
 	"github.com/dgrijalva/jwt-go"
 	"fmt"
 	"regexp"
 	"time"
 	"context"
-
+	"io/ioutil"
+	"sdr/util"
 )
-
-
-
-
-
-
-
 
 /*
 func main() {
 	// initialize database
-	model.Init();
-	model.InitType();
+
 
 	h := handler.New(&handler.Config{
 		Schema: &model.SchemaQL,
@@ -45,14 +37,15 @@ func main() {
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/", fs)
 
-	c := cors.Default().Handler(h);
+
 	http.ListenAndServe(":8080", c)
 	defer model.Close();
 }
 */
 
-
-func main(){
+func main() {
+	model.Init();
+	model.InitType();
 	setupServer()
 }
 
@@ -72,7 +65,9 @@ func setupMux() *http.ServeMux {
 }
 
 func setupServer() {
-	http.ListenAndServe(":8080", setupMux())
+	rootMux := setupMux();
+	//c := cors.Default().Handler(rootMux);
+	http.ListenAndServe(":8080", rootMux)
 }
 func graphqlHandlerFunc(w http.ResponseWriter, r *http.Request) {
 	// get query
@@ -87,6 +82,7 @@ func graphqlHandlerFunc(w http.ResponseWriter, r *http.Request) {
 		Context:        r.Context(), // pass http.Request.Context() to our graphql object
 	}
 	result := graphql.Do(params)
+	fmt.Printf("%+v", result);
 
 	// output JSON
 	var buff []byte
@@ -103,14 +99,10 @@ func graphqlHandlerFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 type Claims struct {
-	username string `json: "username"`
+	userId   string `json:"userId"`
+	username string `json:"username"`
 	password string   `json:"password"` ////???
 	jwt.StandardClaims
-}
-
-type requestBody  struct {
-username string `json:"username"`
-password string `json:"password"`
 }
 
 // secret string for signing requests
@@ -125,9 +117,9 @@ type key int
 // different integer values.
 const userAuthKey key = 0
 
-
 func requireAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		util.PrintBody(r)
 		// extract jwt
 		authorizationHeader := r.Header.Get("Authorization")
 		authRegex, _ := regexp.Compile("(?:Bearer *)([^ ]+)(?: *)")
@@ -158,50 +150,58 @@ func requireAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		// load userID & isAdmin into context
+		// load userID
 		authContext := struct {
-			username  string `json:"username"`
+			username string `json:"username"`
 			password string   `json:"password"`
+			userId   string `json:"userId"`
 		}{
 			claims.username,
 			claims.password,
+			claims.userId,
 		}
 		ctx := context.WithValue(r.Context(), userAuthKey, authContext)
+
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
-func confirmLogin(requestbody requestBody) (bool, error){
-	username := requestbody.username
-	password := requestbody.password
-	return model.IsUserValid(username, password ) , nil
+func confirmLogin(requestbody LoginRequest) (bool, error) {
+	username := requestbody.Username
+	password := requestbody.Password
+	return model.IsUserValid(username, password), nil
 }
+
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 func loginFunc(w http.ResponseWriter, req *http.Request) {
 	// get username & password
-	decoder := json.NewDecoder(req.Body)
-	requestBody := struct {
-		username string `json:"username"`
-		password string `json:"password"`
-	}{}
-	err := decoder.Decode(&requestBody)
+	bodyBytes, _ := ioutil.ReadAll(req.Body)
+	requestBody := LoginRequest{}
+	util.PrintBody(req);
+	err := json.Unmarshal(bodyBytes, &requestBody)
+	fmt.Printf("%+v", requestBody);
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer req.Body.Close()
 
 	// confirmLogin is up to you to define
 	valid, err := confirmLogin(requestBody)
-	if valid==false || err != nil {
+	if valid == false || err != nil {
 		http.Error(w, "invalid login", http.StatusUnauthorized)
 		return
 	}
 
 	//generate token
-	expireToken := time.Now().Add(time.Hour * 1).Unix()
+	expireToken := time.Now().Add(time.Hour * 48).Unix()
 	claims := Claims{
-		requestBody.username,
-		requestBody.password,
+		requestBody.Username,
+		requestBody.Password,
+
 		jwt.StandardClaims{
 			ExpiresAt: expireToken,
 			Issuer:    "localhost:8080",

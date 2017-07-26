@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/jinzhu/gorm"
 	"fmt"
+	"sdr/util"
 )
 
 const (
@@ -41,9 +42,9 @@ func Init() {
 
 	if dev {
 
-		user1 := User{Name: "Nhan", Email: "Dandoh@gmail.com", PasswordMD5: "haha"}
-		user2 := User{Name: "De", Email: "De@gmail.com", PasswordMD5: "haha"}
-		user3 := User{Name: "Shiki", Email: "Shiki@gmail.com", PasswordMD5: "haha"}
+		user1 := User{Name: "Nhan", Email: "Dandoh@gmail.com", PasswordMD5: util.GetMD5Hash("haha")}
+		user2 := User{Name: "De", Email: "De@gmail.com", PasswordMD5: util.GetMD5Hash("haha")}
+		user3 := User{Name: "Shiki", Email: "Shiki@gmail.com", PasswordMD5: util.GetMD5Hash("haha")}
 		db.Create(&user1)
 		db.Create(&user2)
 		db.Create(&user3)

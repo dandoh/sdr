@@ -1,5 +1,7 @@
 package model
 
+import "sdr/util"
+
 func getGroupsContainUser(user User) []Group{
 	var groups []Group
 	db.Model(&user).Association("Groups").Find(&groups)
@@ -62,11 +64,8 @@ func updateNoteForUser(note string, userId int) bool{
 
 func IsUserValid(username string, password string) bool {
 	var user User
-
-	db.Where("username = ?", username).First(&user)
-
-
-	if (user.PasswordMD5 == password) {
+	db.Where("name = ?", username).First(&user)
+	if (user.PasswordMD5 == util.GetMD5Hash(password)) {
 		return true
 	}
 	return false
