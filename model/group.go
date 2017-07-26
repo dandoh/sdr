@@ -54,9 +54,9 @@ func getGroupByName(name string) Group {
 	return group
 }
 
-func addUserToGroup(email string, groupName string) bool{
+func addUserToGroup(email string, groupId int) bool{
 	user := getUserByEmail(email)
-	group:= getGroupByName(groupName)
+	group:= getGroupById(groupId)
 	db.Model(&user).Association("Groups").Append(group)
 	return true;
 }
@@ -67,6 +67,7 @@ func addUserToGroupById(userId int, groupName string) bool{
 	db.Model(&user).Association("Groups").Append(group)
 	return true;
 }
+
 
 func deleteUserInGroup(emailUser string, nameGroup string) bool{
 	user := getUserByEmail(emailUser)

@@ -11,9 +11,9 @@ import (
 
 type User struct {
 	gorm.Model
-	Name        string `gorm:"size:255"`
+	Name        string `gorm:"size:255; unique"`
 	PasswordMD5 string `gorm:"size:255"`
-	Email       string `gorm:"not null"`
+	Email       string `gorm:"not null; unique"`
 	Token       string
 	Note        string    `gorm:"size:2000"`
 	Groups      []Group `gorm:"many2many:user_group"`
@@ -23,7 +23,7 @@ type User struct {
 
 type Group struct {
 	gorm.Model
-	Name    string `gorm:"size:255" json:"name"`
+	Name    string `gorm:"size:255; unique_index" json:"name"`
 	Users   []User    `gorm:"many2many:user_group" json:"users"`
 	Reports []Report
 }
@@ -56,7 +56,7 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 	Name:        "User",
 	Description: "...",
 	Fields: graphql.Fields{
-		"id": &graphql.Field{
+		"userId": &graphql.Field{
 			Type:        graphql.Int,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -126,7 +126,7 @@ var groupType = graphql.NewObject(graphql.ObjectConfig{
 	Name:        "Group",
 	Description: "Group of users",
 	Fields: graphql.Fields{
-		"id": &graphql.Field{
+		"groupId": &graphql.Field{
 			Type:        graphql.Int,
 			Description: "The group's id",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -159,7 +159,7 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 	Name:        "Report",
 	Description: "...",
 	Fields: graphql.Fields{
-		"id": &graphql.Field{
+		"reportId": &graphql.Field{
 			Type:        graphql.Int,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -215,7 +215,7 @@ var commentType = graphql.NewObject(graphql.ObjectConfig{
 	Name:        "Comment",
 	Description: "...",
 	Fields: graphql.Fields{
-		"id": &graphql.Field{
+		"commentId": &graphql.Field{
 			Type:        graphql.Int,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -243,7 +243,7 @@ var todoType = graphql.NewObject(graphql.ObjectConfig{
 	Name:        "Todo",
 	Description: "...",
 	Fields: graphql.Fields{
-		"id": &graphql.Field{
+		"todoId": &graphql.Field{
 			Type:        graphql.Int,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -444,37 +444,61 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 
 			},
 		},
-		"addUsersToGroup": &graphql.Field{
+		//"addUsersToGroup": &graphql.Field{
+		//	Type: graphql.Boolean,
+		//	Args: graphql.FieldConfigArgument{
+		//		"emails": &graphql.ArgumentConfig{
+		//			Type: graphql.NewList(graphql.String),
+		//		},
+		//
+		//		"groupName": &graphql.ArgumentConfig{
+		//			Type: graphql.String,
+		//		},
+		//	},
+		//
+		//	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+		//		emailsArgs := p.Args["emails"].([]interface{})
+		//		emails := make([]string, len(emailsArgs))
+		//
+		//		for i := range emails {
+		//			emails[i] = emailsArgs[i].(string)
+		//		}
+		//
+		//		groupName := p.Args["groupName"].(string)
+		//		for _, email := range emails {
+		//			addUserToGroup(email, groupName)
+		//		}
+		//
+		//		//fmt.Print(emails)
+		//		return true, nil
+		//
+		//	},
+		//
+		//},
+
+		"addUserByEmail": &graphql.Field{
 			Type: graphql.Boolean,
 			Args: graphql.FieldConfigArgument{
-				"emails": &graphql.ArgumentConfig{
-					Type: graphql.NewList(graphql.String),
+				"email": &graphql.ArgumentConfig{
+					Type: graphql.String,
 				},
 
-				"groupName": &graphql.ArgumentConfig{
-					Type: graphql.String,
+				"groupId": &graphql.ArgumentConfig{
+					Type: graphql.Int,
 				},
 			},
 
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				emailsArgs := p.Args["emails"].([]interface{})
-				emails := make([]string, len(emailsArgs))
-
-				for i := range emails {
-					emails[i] = emailsArgs[i].(string)
-				}
-
-				groupName := p.Args["groupName"].(string)
-				for _, email := range emails {
-					addUserToGroup(email, groupName)
-				}
-
+				email := p.Args["email"].(string)
+				groupId := p.Args["groupId"].(int)
+				addUserToGroup(email, groupId)
 				//fmt.Print(emails)
 				return true, nil
 
 			},
 
 		},
+
 		"updateNoteForUser": &graphql.Field{
 			Type: graphql.Boolean,
 			Args: graphql.FieldConfigArgument{
