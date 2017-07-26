@@ -428,12 +428,17 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				"name": &graphql.ArgumentConfig{
 					Type: graphql.NewNonNull(graphql.String),
 				},
+				"userId": &graphql.ArgumentConfig{
+					Type: graphql.NewNonNull(graphql.Int),
+				},
 			},
 
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				name := p.Args["name"].(string)
+				userId := p.Args["userId"].(int)
 				if !isNameGroupExisted(name) {
-					return createGroup(name), nil
+					createGroup(name)
+					addUserToGroupById(userId, name);
 				}
 				return false, nil
 
