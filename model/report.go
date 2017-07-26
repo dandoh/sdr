@@ -20,9 +20,9 @@ func getReportById(id uint) Report{
 	return report
 }
 
-func CreateReport(contentTodoes []string, states  []bool, summerization string, emailUser string, nameGroup string) bool {
+func CreateReport(contentTodoes []string, states  []bool, summerization string, userId int, nameGroup string) bool {
 	// A Report belongs to a user and a group.
-	user := getUserByEmail(emailUser)
+	user := getUserById(userId)
 	group:= getGroupByName(nameGroup)
 	var report Report = Report{Summerization:summerization, UserID:user.ID, GroupID:group.ID}
 	db.Create(&report)

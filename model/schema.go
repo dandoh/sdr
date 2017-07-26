@@ -365,21 +365,12 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 
 		},
 
-		"getNoteByUserId": &graphql.Field{
+		"getNote": &graphql.Field{
 			Type: graphql.String,
-			Args: graphql.FieldConfigArgument{
-				"id": &graphql.ArgumentConfig{
-					Type:        graphql.Int,
-					Description: "...",
-				},
-			},
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				idQuery, isOK := p.Args["id"].(int)
-				if isOK {
-					return getUserById(idQuery).Note, nil
-				}
 
-				return User{}, nil
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				authorContext := p.Context.Value("authorContext").(AuthorContext)
+				return getUserById(int(authorContext.AuthorID)).Note, nil
 			},
 		},
 
@@ -421,17 +412,14 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				"name": &graphql.ArgumentConfig{
 					Type: graphql.NewNonNull(graphql.String),
 				},
-				"userId": &graphql.ArgumentConfig{
-					Type: graphql.NewNonNull(graphql.Int),
-				},
 			},
 
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				name := p.Args["name"].(string)
-				userId := p.Args["userId"].(int)
+				authorContext := p.Context.Value("authorContext").(AuthorContext)
 				if !isNameGroupExisted(name) {
 					createGroup(name)
-					addUserToGroupById(userId, name);
+					addUserToGroupById(int(authorContext.AuthorID), name);
 				}
 				return false, nil
 
@@ -492,25 +480,23 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 
 		},
 
-		"updateNoteForUser": &graphql.Field{
+		"updateNote": &graphql.Field{
 			Type: graphql.Boolean,
 			Args: graphql.FieldConfigArgument{
 				"note": &graphql.ArgumentConfig{
 					Type: graphql.String,
 				},
 
-				"userId": &graphql.ArgumentConfig{
-					Type: graphql.Int,
-				},
 			},
 
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				note := p.Args["note"].(string)
-				userId := p.Args["userId"].(int)
-				return updateNoteForUser(note, userId), nil
+				authorContext := p.Context.Value("authorContext").(AuthorContext)
+				return updateNoteForUser(note, int(authorContext.AuthorID)), nil
 
 			},
 		},
+
 		"deleteUserInGroup": &graphql.Field{
 			Type: graphql.Boolean,
 			Args: graphql.FieldConfigArgument{
@@ -550,10 +536,6 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				},
 
 
-				"userEmail": &graphql.ArgumentConfig{
-					Type: graphql.String,
-				},
-
 				"groupName": &graphql.ArgumentConfig{
 					Type: graphql.String,
 				},
@@ -573,11 +555,11 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 					states[i] = statesArgs[i].(bool)
 				}
 
-				userEmail := p.Args["userEmail"].(string)
 				nameGroup := p.Args["groupName"].(string)
 				summerization := p.Args["summerization"].(string)
+				authorContext := p.Context.Value("authorContext").(AuthorContext)
 
-				return CreateReport(contentTodoes, states, summerization, userEmail, nameGroup), nil
+				return CreateReport(contentTodoes, states, summerization, int(authorContext.AuthorID), nameGroup), nil
 			},
 		},
 		"createComment": &graphql.Field{
@@ -586,9 +568,7 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				"content": &graphql.ArgumentConfig{
 					Type: graphql.String,
 				},
-				"userId": &graphql.ArgumentConfig{
-					Type: graphql.Int,
-				},
+
 				"reportId": &graphql.ArgumentConfig{
 					Type: graphql.Int,
 				},
@@ -596,10 +576,10 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				content := p.Args["content"].(string)
-				userId := p.Args["userId"].(int)
 				reportId := p.Args["reportId"].(int)
+				authorContext := p.Context.Value("authorContext").(AuthorContext)
 
-				return CreateComment(content, uint(userId), uint(reportId)), nil
+				return CreateComment(content, uint(authorContext.AuthorID), uint(reportId)), nil
 			},
 		},
 
