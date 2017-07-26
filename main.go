@@ -63,9 +63,9 @@ func setupMux() *http.ServeMux {
 }
 
 func setupServer() {
-	rootMux := setupMux()
-	//c := cors.Default().Handler(rootMux);
-	http.ListenAndServe(":8080", rootMux)
+	rootMux := setupMux();
+	c := cors.AllowAll().Handler(rootMux);
+	http.ListenAndServe(":8080", c)
 }
 func graphqlHandlerFunc(w http.ResponseWriter, r *http.Request) {
 	// get query
