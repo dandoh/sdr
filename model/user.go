@@ -62,11 +62,11 @@ func updateNoteForUser(note string, userId int) bool{
 	return true
 }
 
-func IsUserValid(username string, password string) bool {
+func GetUserId(username string, password string) (uint, bool) {
 	var user User
 	db.Where("name = ?", username).First(&user)
 	if (user.PasswordMD5 == util.GetMD5Hash(password)) {
-		return true
+		return user.ID, true
 	}
-	return false
+	return 0, false
 }

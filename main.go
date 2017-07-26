@@ -99,23 +99,13 @@ func graphqlHandlerFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 type Claims struct {
-	userId   string `json:"userId"`
-	username string `json:"username"`
-	password string   `json:"password"` ////???
+	UserId   uint`json:"userId"`
+	Username string `json:"username"`
 	jwt.StandardClaims
 }
 
 // secret string for signing requests
-var jwtSecret = []byte("secret") // make sure you change this to something secure
-
-// key type is not exported to prevent collisions with context keys defined in
-// other packages.
-type key int
-
-// userAuthKey is the context key for our added struct.  Its value of zero is
-// arbitrary.  If this package defined other context keys, they would have
-// different integer values.
-const userAuthKey key = 0
+var jwtSecret = []byte("So hello world") // make sure you change this to something secure
 
 func requireAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -150,26 +140,22 @@ func requireAuth(next http.Handler) http.Handler {
 			return
 		}
 
+		fmt.Printf("lau ra: %+v\n", claims)
+		fmt.Printf("authenticating: id is %d", claims.UserId)
 		// load userID
-		authContext := struct {
-			username string `json:"username"`
-			password string   `json:"password"`
-			userId   string `json:"userId"`
-		}{
-			claims.username,
-			claims.password,
-			claims.userId,
+		authContext := model.AuthorContext{
+			AuthorID: claims.UserId,
 		}
-		ctx := context.WithValue(r.Context(), userAuthKey, authContext)
+		ctx := context.WithValue(r.Context(), "authorContext", authContext)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
-func confirmLogin(requestbody LoginRequest) (bool, error) {
+func confirmLogin(requestbody LoginRequest) (uint, bool) {
 	username := requestbody.Username
 	password := requestbody.Password
-	return model.IsUserValid(username, password), nil
+	return model.GetUserId(username, password)
 }
 
 type LoginRequest struct {
@@ -190,23 +176,26 @@ func loginFunc(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// confirmLogin is up to you to define
-	valid, err := confirmLogin(requestBody)
-	if valid == false || err != nil {
+	userId, success := confirmLogin(requestBody)
+	if !success {
 		http.Error(w, "invalid login", http.StatusUnauthorized)
 		return
 	}
 
 	//generate token
 	expireToken := time.Now().Add(time.Hour * 48).Unix()
-	claims := Claims{
-		requestBody.Username,
-		requestBody.Password,
 
+	fmt.Printf("user id is %d, completed login", userId)
+	claims := Claims{
+		userId,
+		requestBody.Username,
 		jwt.StandardClaims{
 			ExpiresAt: expireToken,
 			Issuer:    "localhost:8080",
+			Id:        string(userId),
 		},
 	}
+	fmt.Printf("them vao: %+v\n", claims)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, _ := token.SignedString(jwtSecret)
 

@@ -7,6 +7,7 @@ import (
 	_"fmt"
 	_"container/list"
 	_"github.com/labstack/gommon/email"
+	"fmt"
 )
 
 type User struct {
@@ -334,21 +335,13 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 
 		},
 
-		"getGroupsByUserId": &graphql.Field{
+		"getGroups": &graphql.Field{
 			Type: graphql.NewList(groupType),
-			Args: graphql.FieldConfigArgument{
-				"id": &graphql.ArgumentConfig{
-					Type:        graphql.Int,
-					Description: "...",
-				},
-			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				idQuery, isOK := p.Args["id"].(int)
-				if isOK {
-					return getGroupsByUserId(idQuery), nil
-				}
+				authorContext := p.Context.Value("authorContext").(AuthorContext)
+				fmt.Printf("%+v", authorContext)
+				return getGroupsByUserId(int(authorContext.AuthorID)), nil
 
-				return Group{}, nil
 			},
 
 		},
@@ -593,10 +586,10 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				"content": &graphql.ArgumentConfig{
 					Type: graphql.String,
 				},
-				"userId" : &graphql.ArgumentConfig{
-					Type : graphql.Int,
+				"userId": &graphql.ArgumentConfig{
+					Type: graphql.Int,
 				},
-				"reportId" :&graphql.ArgumentConfig{
+				"reportId": &graphql.ArgumentConfig{
 					Type: graphql.Int,
 				},
 			},
@@ -649,14 +642,13 @@ func InitType() {
 		}, )
 
 	commentType.AddFieldConfig("user", &graphql.Field{
-		Type:       userType,
+		Type:        userType,
 		Description: "...",
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			comment := p.Source.(Comment)
 			return getUserById(int(comment.UserID)), nil
 		},
 	});
-
 	commentType.AddFieldConfig("report", &graphql.Field{
 		Type:        reportType,
 		Description: "...",
