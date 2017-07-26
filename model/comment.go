@@ -1,7 +1,7 @@
 package model
 
-func CreateComment(content string, userId uint, reportId uint) bool {
-	var comment Comment = Comment{Content:content, UserID: userId, ReportID: reportId}
+func CreateComment(content string, userID uint, reportID uint) bool {
+	comment := Comment{Content: content, UserID: userID, ReportID: reportID}
 	db.Create(&comment)
 	return true
 }

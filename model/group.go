@@ -1,78 +1,70 @@
 package model
 
-func getGroupById(id int) Group {
-	var group Group
+func getGroupByID(id int) (group Group) {
 	db.First(&group, id)
-	return group
+	return
 }
 
-func getUsersInGroup(group Group) []User{
-	var users []User
+func getUsersInGroup(group Group) (users []User) {
 	db.Model(&group).Association("Users").Find(&users)
-	return users
+	return
 }
 
-func getUsersByGroupId(id int) []User{
-	var users []User
-	group := getGroupById(id)
+func getUsersByGroupID(id int) (users []User) {
+	group := getGroupByID(id)
 	db.Model(&group).Association("Users").Find(&users)
-	return users
+	return
 }
 
-func getReportsByGroupId(id int) []Report{
-	var reports []Report
-	var group Group = getGroupById(id)
+func getReportsByGroupID(id int) (reports []Report) {
+	group := getGroupByID(id)
 	db.Model(&group).Association("Reports").Find(&reports)
-	return reports
+	return
 }
 
-func getReportsByGroupName(name string) []Report{
-	var reports []Report
-	var group Group = getGroupByName(name)
+func getReportsByGroupName(name string) (reports []Report) {
+	group := getGroupByName(name)
 	db.Model(&group).Association("Reports").Find(&reports)
-	return reports
+	return
 }
 
-func isNameGroupExisted(name string) bool{
+func isNameGroupExisted(name string) bool {
 	var group Group
 	var count int
 	db.Where("name = ?", name).Find(&group).Count(&count)
-	if (count > 0){
+	if count > 0 {
 		return true
 	}
 	return false
 }
 
-func createGroup(name string) bool{
-	db.Create(&Group{Name:name})
-	return true;
+func createGroup(name string) bool {
+	db.Create(&Group{Name: name})
+	return true
 }
 
-func getGroupByName(name string) Group {
-	var group Group
-	db.Where("name = ?",name).First(&group)
-	return group
+func getGroupByName(name string) (group Group) {
+	db.Where("name = ?", name).First(&group)
+	return
 }
 
-func addUserToGroup(email string, groupId int) bool{
+func addUserToGroup(email string, groupID int) bool {
 	user := getUserByEmail(email)
-	group:= getGroupById(groupId)
+	group := getGroupByID(groupID)
 	db.Model(&user).Association("Groups").Append(group)
-	return true;
+	return true
 }
 
-func addUserToGroupById(userId int, groupName string) bool{
-	user := getUserById(userId)
-	group:= getGroupByName(groupName)
+func addUserToGroupByID(userID int, groupName string) bool {
+	user := getUserByID(userID)
+	group := getGroupByName(groupName)
 	db.Model(&user).Association("Groups").Append(group)
-	return true;
+	return true
 }
 
-
-func deleteUserInGroup(emailUser string, nameGroup string) bool{
+func deleteUserInGroup(emailUser string, nameGroup string) bool {
 	user := getUserByEmail(emailUser)
 	group := getGroupByName(nameGroup)
 	db.Model(&user).Association("Groups").Delete(group)
 	return true
 }
-

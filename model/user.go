@@ -1,71 +1,68 @@
 package model
 
-import "sdr/util"
+import "github.com/dandoh/sdr/util"
 
-func getGroupsContainUser(user User) []Group{
-	var groups []Group
+func getGroupsContainUser(user User) (groups []Group) {
 	db.Model(&user).Association("Groups").Find(&groups)
-	return groups
+	return
 }
 
-func getReportsOfUser(user User) []Report{
-	var reports []Report
+func getReportsOfUser(user User) (reports []Report) {
 	db.Model(&user).Association("Reports").Find(&reports)
-	return reports
+	return
 }
 
-func getCommentsOfUser(user User) []Comment{
-	var comments []Comment
+func getCommentsOfUser(user User) (comments []Comment) {
 	db.Model(&user).Association("Comments").Find(&comments)
-	return comments
+	return
 }
 
-func getUserById(id int) User{
-	var user User
+func getUserByID(id int) (user User) {
 	db.First(&user, id)
-	return user
+	return
 }
 
-func getUserByEmail(email string) User{
-	var user User
-	db.Where("email = ?",email).First(&user)
-	return user
+func getUserByEmail(email string) (user User) {
+	db.Where("email = ?", email).First(&user)
+	return
 }
 
-func getGroupsByUserId(id int) []Group{
-	var groups []Group
-	var user User = getUserById(id)
+func getGroupsByUserID(id int) (groups []Group) {
+	user := getUserByID(id)
 	db.Model(&user).Association("Groups").Find(&groups)
-	return groups
+	return
 }
 
-func isEmailExisted(email string) bool{
+func isEmailExisted(email string) bool {
 	var user User
 	var count int
-	db.Where("email = ?",email).Find(&user).Count(&count)
-	if (count > 0){
+	db.Where("email = ?", email).Find(&user).Count(&count)
+	if count > 0 {
 		return true
 	}
 	return false
 }
 
-
-func createAccount(name string, password string, email string) bool{
-	var user User = User{Name:name, PasswordMD5:password, Email:email}
+func createAccount(name string, password string, email string) bool {
+	user := User{
+		Name:        name,
+		PasswordMD5: password,
+		Email:       email,
+	}
 	db.Create(&user)
 	return true
 }
 
-func updateNoteForUser(note string, userId int) bool{
-	user := getUserById(userId)
+func updateNoteForUser(note string, userID int) bool {
+	user := getUserByID(userID)
 	db.Model(&user).Update("note", note)
 	return true
 }
 
-func GetUserId(username string, password string) (uint, bool) {
+func GetUserID(username string, password string) (uint, bool) {
 	var user User
 	db.Where("name = ?", username).First(&user)
-	if (user.PasswordMD5 == util.GetMD5Hash(password)) {
+	if user.PasswordMD5 == util.GetMD5Hash(password) {
 		return user.ID, true
 	}
 	return 0, false

@@ -1,26 +1,24 @@
 package main
 
 import (
-	_"github.com/jinzhu/gorm/dialects/postgres"
-	"sdr/model"
-	"github.com/graphql-go/handler"
-	"net/http"
-	_"fmt"
-	_"github.com/rs/cors"
-	"github.com/graphql-go/graphql"
-	_"encoding/json"
-	_"github.com/dgrijalva/jwt-go"
-	_"github.com/graphql-go/graphql"
-	_"github.com/graphql-go/handler"
-	_"github.com/jinzhu/gorm"
+	"context"
 	"encoding/json"
-	"github.com/dgrijalva/jwt-go"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"regexp"
 	"time"
-	"context"
-	"io/ioutil"
-	"sdr/util"
+
+	util "github.com/dandoh/sdr/util"
+
+	model "github.com/dandoh/sdr/model"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/graphql-go/graphql"
+	"github.com/graphql-go/handler"
+	_ "github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
+	_ "github.com/rs/cors"
 )
 
 /*
@@ -44,8 +42,8 @@ func main() {
 */
 
 func main() {
-	model.Init();
-	model.InitType();
+	model.Init()
+	model.InitType()
 	setupServer()
 }
 
@@ -65,7 +63,7 @@ func setupMux() *http.ServeMux {
 }
 
 func setupServer() {
-	rootMux := setupMux();
+	rootMux := setupMux()
 	//c := cors.Default().Handler(rootMux);
 	http.ListenAndServe(":8080", rootMux)
 }
@@ -82,24 +80,24 @@ func graphqlHandlerFunc(w http.ResponseWriter, r *http.Request) {
 		Context:        r.Context(), // pass http.Request.Context() to our graphql object
 	}
 	result := graphql.Do(params)
-	fmt.Printf("%+v", result);
+	fmt.Printf("%+v", result)
 
 	// output JSON
 	var buff []byte
 	w.WriteHeader(http.StatusOK)
 	/*
-	if prettyPrintGraphQL {
-		buff, _ = json.MarshalIndent(result, "", "\t")
-	} else {
-		buff, _ = json.Marshal(result)
-	}
+		if prettyPrintGraphQL {
+			buff, _ = json.MarshalIndent(result, "", "\t")
+		} else {
+			buff, _ = json.Marshal(result)
+		}
 	*/
 	buff, _ = json.Marshal(result)
 	w.Write(buff)
 }
 
 type Claims struct {
-	UserId   uint`json:"userId"`
+	UserID   uint   `json:"userId"`
 	Username string `json:"username"`
 	jwt.StandardClaims
 }
@@ -141,10 +139,10 @@ func requireAuth(next http.Handler) http.Handler {
 		}
 
 		fmt.Printf("lau ra: %+v\n", claims)
-		fmt.Printf("authenticating: id is %d", claims.UserId)
+		fmt.Printf("authenticating: id is %d", claims.UserID)
 		// load userID
 		authContext := model.AuthorContext{
-			AuthorID: claims.UserId,
+			AuthorID: claims.UserID,
 		}
 		ctx := context.WithValue(r.Context(), "authorContext", authContext)
 
@@ -155,7 +153,7 @@ func requireAuth(next http.Handler) http.Handler {
 func confirmLogin(requestbody LoginRequest) (uint, bool) {
 	username := requestbody.Username
 	password := requestbody.Password
-	return model.GetUserId(username, password)
+	return model.GetUserID(username, password)
 }
 
 type LoginRequest struct {
@@ -167,16 +165,16 @@ func loginFunc(w http.ResponseWriter, req *http.Request) {
 	// get username & password
 	bodyBytes, _ := ioutil.ReadAll(req.Body)
 	requestBody := LoginRequest{}
-	util.PrintBody(req);
+	util.PrintBody(req)
 	err := json.Unmarshal(bodyBytes, &requestBody)
-	fmt.Printf("%+v", requestBody);
+	fmt.Printf("%+v", requestBody)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// confirmLogin is up to you to define
-	userId, success := confirmLogin(requestBody)
+	userID, success := confirmLogin(requestBody)
 	if !success {
 		http.Error(w, "invalid login", http.StatusUnauthorized)
 		return
@@ -185,14 +183,14 @@ func loginFunc(w http.ResponseWriter, req *http.Request) {
 	//generate token
 	expireToken := time.Now().Add(time.Hour * 48).Unix()
 
-	fmt.Printf("user id is %d, completed login", userId)
+	fmt.Printf("user id is %d, completed login", userID)
 	claims := Claims{
-		userId,
+		userID,
 		requestBody.Username,
 		jwt.StandardClaims{
 			ExpiresAt: expireToken,
 			Issuer:    "localhost:8080",
-			Id:        string(userId),
+			Id:        string(userID),
 		},
 	}
 	fmt.Printf("them vao: %+v\n", claims)
