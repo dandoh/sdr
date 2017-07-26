@@ -372,6 +372,24 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 
 		},
 
+		"getNoteByUserId": &graphql.Field{
+			Type: graphql.String,
+			Args: graphql.FieldConfigArgument{
+				"id": &graphql.ArgumentConfig{
+					Type:        graphql.Int,
+					Description: "...",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				idQuery, isOK := p.Args["id"].(int)
+				if isOK {
+					return getUserById(idQuery).Note, nil
+				}
+
+				return User{}, nil
+			},
+		},
+
 	},
 })
 
