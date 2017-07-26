@@ -109,6 +109,7 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 				return getReportsOfUser(user), nil
 			},
 		},
+
 		"comments": &graphql.Field{
 			Type:        graphql.NewList(commentType),
 			Description: "Which posts they have written.",
@@ -222,7 +223,7 @@ var commentType = graphql.NewObject(graphql.ObjectConfig{
 				return comment.ID, nil
 			},
 		},
-
+		//
 		"content": &graphql.Field{
 			Type:        graphql.String,
 			Description: "...",
@@ -513,7 +514,7 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 					Type: graphql.String,
 				},
 
-				"nameGroup": &graphql.ArgumentConfig{
+				"groupName": &graphql.ArgumentConfig{
 					Type: graphql.String,
 				},
 			},
@@ -533,10 +534,32 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				}
 
 				userEmail := p.Args["userEmail"].(string)
-				nameGroup := p.Args["nameGroup"].(string)
+				nameGroup := p.Args["groupName"].(string)
 				summerization := p.Args["summerization"].(string)
 
 				return CreateReport(contentTodoes, states, summerization, userEmail, nameGroup), nil
+			},
+		},
+		"createComment": &graphql.Field{
+			Type: graphql.Boolean,
+			Args: graphql.FieldConfigArgument{
+				"content": &graphql.ArgumentConfig{
+					Type: graphql.String,
+				},
+				"userId" : &graphql.ArgumentConfig{
+					Type : graphql.Int,
+				},
+				"reportId" :&graphql.ArgumentConfig{
+					Type: graphql.Int,
+				},
+			},
+
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				content := p.Args["content"].(string)
+				userId := p.Args["userId"].(int)
+				reportId := p.Args["reportId"].(int)
+
+				return CreateComment(content, uint(userId), uint(reportId)), nil
 			},
 		},
 
@@ -579,19 +602,20 @@ func InitType() {
 		}, )
 
 	commentType.AddFieldConfig("user", &graphql.Field{
-		Type:        graphql.Type(reportType),
+		Type:       reportType,
 		Description: "...",
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			comment := p.Source.(Comment)
 			return getReportById(comment.ReportID), nil
 		},
 	});
+
 	commentType.AddFieldConfig("report", &graphql.Field{
 		Type:        reportType,
 		Description: "...",
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-			todo := p.Source.(Todo)
-			return getReportById(todo.ReportID), nil
+			comment := p.Source.(Comment)
+			return getReportById(comment.ReportID), nil
 		},
 	})
 }

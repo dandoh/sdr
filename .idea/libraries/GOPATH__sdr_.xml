@@ -1,6 +1,7 @@
 <component name="libraryTable">
   <library name="GOPATH &lt;sdr&gt;">
     <CLASSES>
+      <root url="file://$PROJECT_DIR$/../authentication" />
       <root url="file://$PROJECT_DIR$/../server" />
       <root url="file://$PROJECT_DIR$/../gorm_play" />
       <root url="file://$PROJECT_DIR$/../Go-Signup-Login-Example-MySQL" />
@@ -11,8 +12,12 @@
       <root url="file://$PROJECT_DIR$/../project" />
       <root url="file://$PROJECT_DIR$/../project.store" />
       <root url="file://$PROJECT_DIR$/../go-echo-vue" />
+      <root url="file://$PROJECT_DIR$/../tem" />
+      <root url="file://$PROJECT_DIR$/../sdr_vuthede" />
+      <root url="file://$PROJECT_DIR$/../sdr1" />
     </CLASSES>
     <SOURCES>
+      <root url="file://$PROJECT_DIR$/../authentication" />
       <root url="file://$PROJECT_DIR$/../server" />
       <root url="file://$PROJECT_DIR$/../gorm_play" />
       <root url="file://$PROJECT_DIR$/../Go-Signup-Login-Example-MySQL" />
@@ -23,6 +28,9 @@
       <root url="file://$PROJECT_DIR$/../project" />
       <root url="file://$PROJECT_DIR$/../project.store" />
       <root url="file://$PROJECT_DIR$/../go-echo-vue" />
+      <root url="file://$PROJECT_DIR$/../tem" />
+      <root url="file://$PROJECT_DIR$/../sdr_vuthede" />
+      <root url="file://$PROJECT_DIR$/../sdr1" />
     </SOURCES>
     <excluded>
       <root url="file://$PROJECT_DIR$" />
