@@ -56,7 +56,7 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 	Name:        "User",
 	Description: "...",
 	Fields: graphql.Fields{
-		"id": &graphql.Field{
+		"userId": &graphql.Field{
 			Type:        graphql.Int,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -126,7 +126,7 @@ var groupType = graphql.NewObject(graphql.ObjectConfig{
 	Name:        "Group",
 	Description: "Group of users",
 	Fields: graphql.Fields{
-		"id": &graphql.Field{
+		"groupId": &graphql.Field{
 			Type:        graphql.Int,
 			Description: "The group's id",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -159,7 +159,7 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 	Name:        "Report",
 	Description: "...",
 	Fields: graphql.Fields{
-		"id": &graphql.Field{
+		"reportId": &graphql.Field{
 			Type:        graphql.Int,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -215,7 +215,7 @@ var commentType = graphql.NewObject(graphql.ObjectConfig{
 	Name:        "Comment",
 	Description: "...",
 	Fields: graphql.Fields{
-		"id": &graphql.Field{
+		"commentId": &graphql.Field{
 			Type:        graphql.Int,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -243,7 +243,7 @@ var todoType = graphql.NewObject(graphql.ObjectConfig{
 	Name:        "Todo",
 	Description: "...",
 	Fields: graphql.Fields{
-		"id": &graphql.Field{
+		"todoId": &graphql.Field{
 			Type:        graphql.Int,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {

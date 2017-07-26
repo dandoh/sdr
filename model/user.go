@@ -59,3 +59,15 @@ func updateNoteForUser(note string, userId int) bool{
 	db.Model(&user).Update("note", note)
 	return true
 }
+
+func IsUserValid(username string, password string) bool {
+	var user User
+
+	db.Where("username = ?", username).First(&user)
+
+
+	if (user.PasswordMD5 == password) {
+		return true
+	}
+	return false
+}
