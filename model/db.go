@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	DB_USER     = "postgres"
-	DB_PASSWORD = "123456789"
-	DB_NAME     = "Scoville_Info"
+	DB_USER     = "Dandoh"
+	DB_PASSWORD = "dandoh"
+	DB_NAME     = "sdr_gorm"
 )
 
 var db *gorm.DB

@@ -425,37 +425,6 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 
 			},
 		},
-		//"addUsersToGroup": &graphql.Field{
-		//	Type: graphql.Boolean,
-		//	Args: graphql.FieldConfigArgument{
-		//		"emails": &graphql.ArgumentConfig{
-		//			Type: graphql.NewList(graphql.String),
-		//		},
-		//
-		//		"groupName": &graphql.ArgumentConfig{
-		//			Type: graphql.String,
-		//		},
-		//	},
-		//
-		//	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-		//		emailsArgs := p.Args["emails"].([]interface{})
-		//		emails := make([]string, len(emailsArgs))
-		//
-		//		for i := range emails {
-		//			emails[i] = emailsArgs[i].(string)
-		//		}
-		//
-		//		groupName := p.Args["groupName"].(string)
-		//		for _, email := range emails {
-		//			addUserToGroup(email, groupName)
-		//		}
-		//
-		//		//fmt.Print(emails)
-		//		return true, nil
-		//
-		//	},
-		//
-		//},
 
 		"addUserByEmail": &graphql.Field{
 			Type: graphql.Boolean,
