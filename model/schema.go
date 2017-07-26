@@ -625,11 +625,11 @@ func InitType() {
 		}, )
 
 	commentType.AddFieldConfig("user", &graphql.Field{
-		Type:       reportType,
+		Type:       userType,
 		Description: "...",
 		Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 			comment := p.Source.(Comment)
-			return getReportById(comment.ReportID), nil
+			return getUserById(int(comment.UserID)), nil
 		},
 	});
 
