@@ -11,14 +11,14 @@ class App extends React.Component {
     let match = regex.exec(location.pathname);
     if (match) key = match[1];
     return (
-      <div style={{width: "100%", overflow: "auto"}}>
-        <div style={{float: "left", width: "20%"}}>
+      <div className="row">
+        <div className="col-sm-3" >
           <NavigationPanel location={location}/>
         </div>
-        <div style={{float: "left", width: "45%"}} key={key}>
+        <div className="col-sm-5" key={key}>
           {children ? children : null}
         </div>
-        <div style={{float: "left"}}>
+        <div className="col-sm-4">
           <NotePanel/>
         </div>
       </div>

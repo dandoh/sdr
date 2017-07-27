@@ -29,7 +29,7 @@ class SignUpPage extends React.Component {
             <div className="col-md-4">
               <input id="email" name="email" type="email" placeholder="e.g dandoh@gmail.com"
                      className="form-control input-md" value={this.state.email}
-                     onChange={this.handleChangeEmail()}
+                     onChange={this.handleChangeEmail}
               />
             </div>
           </div>
@@ -86,7 +86,30 @@ class SignUpPage extends React.Component {
 
   handleSubmit(e) {
     e.preventDefault();
+    fetch("http://localhost:8080/signup", {
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json',
+      },
+      method: "POST",
+      body: JSON.stringify({
+        username: this.state.username,
+        password: this.state.password,
+        email: this.state.email,
+      })
+    }).then(res => {
+      res.json().then(
+        json => {
+          if (json.status == 'success') {
+            alert("Registering succeeded!");
+            this.props.router.replace('/sign-in');
+          } else {
+            alert("Name or email existed!");
+          }
+        }
+      )
+    })
   }
 }
 
-export default SignUpPage
+export default withRouter(SignUpPage)

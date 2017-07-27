@@ -1,19 +1,22 @@
 import React from 'react';
 import {withRouter} from "react-router";
-import './TodoStyle.css'
+import '../style/TodoStyle.css'
 import {graphql} from 'react-apollo'
 import gql from 'graphql-tag'
 import Loading from '../components/Loading'
 import Error from '../components/Error'
 import TodoList from '../components/TodoList';
+import CommentList from '../components/CommentList';
 
-import './TodoStyle.css'
+import '../style/TodoStyle.css'
+import '../style/CommentStyle.css'
 
 class ReportDetailPage extends React.Component {
   constructor() {
     super();
     this.state = {
-      summerization: ""
+      summerization: "",
+      comment: ""
     };
 
     this.onTick = this.onTick.bind(this);
@@ -21,70 +24,63 @@ class ReportDetailPage extends React.Component {
     this.onEnterTodo = this.onEnterTodo.bind(this);
     this.onChangeSummerization = this.onChangeSummerization.bind(this);
     this.onUpdateClick = this.onUpdateClick.bind(this);
+    this.onCommentChange = this.onCommentChange.bind(this);
+    this.onSubmitComment = this.onSubmitComment.bind(this);
   }
 
-  onTick(todo) {
-    if (todo.state == 0) {
-      todo.state = 1;
-    } else {
-      todo.state = 0;
-    }
-    this.setState({
-      todoes: [...this.state.todoes]
-    })
-  }
-
-
-  onDelete(deleletedTodo) {
-    this.setState({
-      todoes: this.state.todoes.filter(todo => todo != deleletedTodo)
-    });
-  }
-
-  onEnterTodo(e) {
-    if (e.which == 13) {
-      let content = e.target.value;
-      let newTodo = {
-        content,
-        state: 0
-      };
-      e.target.value = "";
-      this.setState({
-        todoes: this.state.todoes.concat(newTodo)
-      });
-    }
-  }
-
-  onChangeSummerization(e) {
-    e.preventDefault();
-    this.setState({summerization: e.target.value})
-  }
-
-  componentWillReceiveProps(newProps) {
-    // note: set data to the state after receive from server
-    let {getReportById} = newProps.data;
-    let report = getReportById;
-    if (report && !this.state.todoes) {
-      this.setState({
-        todoes: report.todoes || [],
-        summerization: report.summerization,
-      });
-    }
-  }
 
   render() {
     return (
       <div>
-        {this.reportContent()}
+        {this.reportSection()}
         {/*comment here*/}
         <br/>
         <br/>
+        <div className="container">
+          <div className="row">
+            <h4>Comment</h4>
+          </div>
+          <div className="row">
+            <div className="col-md-6">
+              <div className="widget-area no-padding blank">
+                <div className="status-upload">
+                  <form onSubmit={this.onSubmitComment}>
+                    <textarea placeholder="Leave a comment" onChange={this.onCommentChange} value={this.state.comment}>
+                    </textarea>
+                    <button type="submit"
+                            className="btn btn-success green"><i className="fa fa-share"/>
+                      Comment
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
 
+          </div>
+        </div>
+
+        {this.commentSection()}
       </div>
+
     )
   }
 
-  reportContent() {
+  commentSection() {
+    let {loading, error, getReportById} = this.props.data;
+    if (error) {
+      return (<Error/>)
+    } else if (loading) {
+      return (<Loading/>)
+    } else {
+      return (
+        <div className="container">
+          <CommentList comments={getReportById.comments}/>
+        </div>
+      )
+    }
+  }
+
+  reportSection() {
     let {loading, error, getReportById} = this.props.data;
     if (error) {
       return (<Error/>)
@@ -139,6 +135,55 @@ class ReportDetailPage extends React.Component {
     }
   }
 
+  onTick(todo) {
+    if (todo.state == 0) {
+      todo.state = 1;
+    } else {
+      todo.state = 0;
+    }
+    this.setState({
+      todoes: [...this.state.todoes]
+    })
+  }
+
+
+  onDelete(deleletedTodo) {
+    this.setState({
+      todoes: this.state.todoes.filter(todo => todo != deleletedTodo)
+    });
+  }
+
+  onEnterTodo(e) {
+    if (e.which == 13) {
+      let content = e.target.value;
+      let newTodo = {
+        content,
+        state: 0
+      };
+      e.target.value = "";
+      this.setState({
+        todoes: this.state.todoes.concat(newTodo)
+      });
+    }
+  }
+
+  onChangeSummerization(e) {
+    e.preventDefault();
+    this.setState({summerization: e.target.value})
+  }
+
+  componentWillReceiveProps(newProps) {
+    // note: set data to the state after receive from server
+    let {getReportById} = newProps.data;
+    let report = getReportById;
+    if (report && !this.state.todoes) {
+      this.setState({
+        todoes: report.todoes || [],
+        summerization: report.summerization,
+      });
+    }
+  }
+
   onUpdateClick() {
     this.props.updateReport({
       variables: {
@@ -154,6 +199,30 @@ class ReportDetailPage extends React.Component {
       alert("Can't update report");
     })
   }
+
+  onCommentChange(e) {
+    e.preventDefault();
+    this.setState({comment: e.target.value});
+  }
+
+  onSubmitComment(e) {
+    e.preventDefault();
+    this.props.createComment({
+      variables: {
+        content: this.state.comment,
+        reportId: this.props.params.reportId
+      }
+    }).then(res => {
+      this.props.data.refetch();
+      this.setState({
+        comment: "",
+      });
+    }, err => {
+      alert("Something wrong happened, dude!")
+    })
+  }
+
+
 }
 
 const getReportDetailQuery = gql`query 
@@ -199,6 +268,23 @@ const updateReport = gql`mutation
   }
 `;
 
-const withMutation = graphql(updateReport, {name: 'updateReport'});
 
-export default withMutation(withData(withRouter(ReportDetailPage)))
+const createComment = gql`mutation
+  CreateComment($content: String, $reportId: Int) {
+    createComment(content: $content, reportId: $reportId)
+  }`;
+
+const withUpdateReport = graphql(updateReport, {name: 'updateReport'});
+
+const withCreateComment = graphql(createComment, {name: 'createComment'});
+
+
+export default withCreateComment(
+  withUpdateReport(
+    withData(
+      withRouter(
+        ReportDetailPage
+      )
+    )
+  )
+);

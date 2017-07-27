@@ -3,7 +3,6 @@
  */
 import React from "react";
 import CommentItem from "./CommentItem";
-import './CommentStyle.css'
 export default function CommentList({comments}) {
   return (
     <div>

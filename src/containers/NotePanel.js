@@ -22,7 +22,7 @@ class NotePanel extends React.Component {
     } else if (loading) {
       return (<Loading/>)
     } else {
-      return <textarea rows="4" cols="30" onBlur={this.handleUpdateNote}>{getNote}</textarea>
+      return <textarea rows="20" cols="40" onBlur={this.handleUpdateNote}>{getNote}</textarea>
     }
   }
 

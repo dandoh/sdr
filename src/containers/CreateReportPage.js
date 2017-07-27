@@ -2,7 +2,7 @@ import React from 'react';
 import {withRouter} from "react-router";
 import {graphql} from "react-apollo";
 import gql from "graphql-tag";
-import './TodoStyle.css'
+import '../style/TodoStyle.css'
 import {Button, Glyphicon} from "react-bootstrap";
 import TodoList from '../components/TodoList';
 

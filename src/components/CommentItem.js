@@ -16,7 +16,7 @@ export default function CommentItem({comment}) {
           </div>
         </div>
 
-        <div className="col-sm-8">
+        <div className="col-sm-4">
           <div className="panel panel-default">
             <div className="panel-heading">
               <strong>{comment.user.name}</strong> <span className="text-muted">commented</span>
