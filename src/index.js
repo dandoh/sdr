@@ -12,6 +12,7 @@ import CreateReportPage from './containers/CreateReportPage'
 import UsersPage from './containers/UsersPage'
 import SignInPage from './containers/SignInPage'
 import SignUpPage from './containers/SignUpPage'
+import ReportDetailPage from './containers/ReportDetailPage'
 
 
 const logErrors = {
@@ -38,12 +39,8 @@ networkInterface.use([{
     if (!req.options.headers) {
       req.options.headers = {};  // Create the header object if needed.
     }
-
-    console.log("Den day roi");
     // get the authentication token from local storage if it exists
     let token = localStorage.getItem("token");
-    console.log("Get token", localStorage.getItem("token"));
-    console.log(token);
     req.options.headers.authorization = token ? `Bearer ${token}` : null;
     next();
   }
@@ -79,6 +76,7 @@ ReactDOM.render((
               <Route path=":groupId" component={GroupPage}/>
               <Route path=":groupId/create_report" component={CreateReportPage}/>
               <Route path=":groupId/users" component={UsersPage}/>
+              <Route path=":groupId/report/:reportId" component={ReportDetailPage}/>
             </Route>
           </Route>
           <Route onEnter={ensureSignedOut}>

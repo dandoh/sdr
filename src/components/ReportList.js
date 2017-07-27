@@ -6,13 +6,15 @@ import ReportItem from "./ReportItem";
 export default function ReportList({reports}) {
   return (
     <div>
-      {reports.map((report) => {
-          return (
-            <ReportItem key={report.reportId}
-                        report={report}/>
-          )
-        }
-      )}
+      <ul className="list-group">
+        {reports.map((report) => {
+            return (
+              <ReportItem key={report.reportId}
+                          report={report}/>
+            )
+          }
+        )}
+      </ul>
     </div>
   )
 }

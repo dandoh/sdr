@@ -38,13 +38,16 @@ const getReportsQuery = gql`query
   GetReportsQuery($id: Int) {
     getReportsByGroupId(id: $id) {
       reportId
-      summerization
       user {
+        userId
         name
       }
       todoes {
         content
         state
+      }
+      group {
+        groupId
       }
     }
   }`;
@@ -58,7 +61,7 @@ const withData = graphql(getReportsQuery, {
       forceFetch: true,
     }
   }
-})(withRouter(GroupPage));
+});
 
 
-export default withData;
+export default withData(withRouter(GroupPage));

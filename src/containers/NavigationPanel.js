@@ -26,8 +26,6 @@ class NavigationPanel extends React.Component {
     let {loading, getGroups} = this.props.data;
     let groups = getGroups;
 
-    console.log("navigation", this.props);
-
     const loadingView = (
       <div>Loading...</div>
     );
@@ -121,7 +119,7 @@ const withData = graphql(getGroupsQuery, {
 });
 
 const createNewGroup = gql`mutation createNewGroup($name: String!){
-  createGroup(name: $name)
+  addGroup(name: $name)
 }`;
 
 const withMutation = graphql(createNewGroup, {name: 'createNewGroup'});
