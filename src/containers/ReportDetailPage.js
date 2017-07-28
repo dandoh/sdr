@@ -1,6 +1,5 @@
 import React from 'react';
 import {withRouter} from "react-router";
-import '../style/TodoStyle.css'
 import {graphql} from 'react-apollo'
 import gql from 'graphql-tag'
 import Loading from '../components/Loading'
@@ -8,8 +7,6 @@ import Error from '../components/Error'
 import TodoList from '../components/TodoList';
 import CommentList from '../components/CommentList';
 
-import '../style/TodoStyle.css'
-import '../style/CommentStyle.css'
 
 class ReportDetailPage extends React.Component {
   constructor() {
