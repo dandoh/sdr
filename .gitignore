@@ -8,6 +8,11 @@
 
 # production
 /build
+.idea/*
+vendor/*
+project
+public/*
+.env
 
 # misc
 .DS_Store
