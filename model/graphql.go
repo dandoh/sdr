@@ -12,7 +12,7 @@ import (
 var queryType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "RootQuery",
 	Fields: graphql.Fields{
-		"getGroupById": &graphql.Field{
+		"group": &graphql.Field{
 			Type: groupType,
 			Args: graphql.FieldConfigArgument{
 				"id": &graphql.ArgumentConfig{
@@ -29,7 +29,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 
-		"getReportsByGroupId": &graphql.Field{
+		"reportsOfGroup": &graphql.Field{
 			Type: graphql.NewList(reportType),
 			Args: graphql.FieldConfigArgument{
 				"id": &graphql.ArgumentConfig{
@@ -47,7 +47,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 			},
 
 		},
-		"getReportById": &graphql.Field{
+		"report": &graphql.Field{
 			Type: reportType,
 			Args: graphql.FieldConfigArgument{
 				"id": &graphql.ArgumentConfig{
@@ -58,7 +58,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				idQuery, isOK := p.Args["id"].(int)
 				if isOK {
-          return findReportByID(uint(idQuery)), nil
+					return findReportByID(uint(idQuery)), nil
 				}
 
 				return Report{}, nil
@@ -86,7 +86,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 		//
 		//},
 
-		"getGroups": &graphql.Field{
+		"groups": &graphql.Field{
 			Type: graphql.NewList(groupType),
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				authorContext := p.Context.Value("authorContext").(AuthorContext)
@@ -97,7 +97,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 
 		},
 
-		"getUsersByGroupId": &graphql.Field{
+		"usersOfGroup": &graphql.Field{
 			Type: graphql.NewList(userType),
 			Args: graphql.FieldConfigArgument{
 				"id": &graphql.ArgumentConfig{
@@ -116,7 +116,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 
 		},
 
-		"getNote": &graphql.Field{
+		"note": &graphql.Field{
 			Type: graphql.String,
 
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -264,7 +264,7 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 					Type: graphql.NewList(graphql.String),
 				},
 
-				"states" : &graphql.ArgumentConfig{
+				"states": &graphql.ArgumentConfig{
 					Type: graphql.NewList(graphql.Int),
 				},
 
@@ -294,10 +294,10 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				}
 
 				reportId := p.Args["reportId"].(int)
-        summary := ""
-        if p.Args["summary"] != nil {
-          summary = p.Args["summary"].(string)
-        }
+				summary := ""
+				if p.Args["summary"] != nil {
+					summary = p.Args["summary"].(string)
+				}
 				//summary := p.Args["summary"](string)
 				status := p.Args["status"].(string)
 
