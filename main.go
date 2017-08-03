@@ -45,7 +45,7 @@ func setupMux() *http.ServeMux {
 	graphqlHandler := http.HandlerFunc(graphqlHandlerFunc)
 
 	// login Handler
-  mux.Handle("/", http.FileServer(http.Dir("./public")))
+	mux.Handle("/", http.FileServer(http.Dir("./public")))
 	mux.HandleFunc("/login", loginFunc)
 	mux.HandleFunc("/signup", signupFunc)
 	// add in addContext middlware
@@ -92,7 +92,6 @@ type Claims struct {
 	UserID   uint   `json:"userId"`
 	Username string `json:"username"`
 	jwt.StandardClaims
-
 }
 
 func requireAuth(next http.Handler) http.Handler {
@@ -139,18 +138,17 @@ func requireAuth(next http.Handler) http.Handler {
 	})
 }
 
-
 func confirmLogin(requestbody LoginRequest) (uint, bool) {
 	username := requestbody.Username
 	password := requestbody.Password
 	return model.GetUserID(username, password)
 }
 
-func confirmSignUp(requestbody SignupRequest) bool{
+func confirmSignUp(requestbody SignupRequest) bool {
 	username := requestbody.Username
 	password := requestbody.Password
 	email := requestbody.Email
-	if (model.IsUserExisted(username, email) == false){
+	if (model.IsUserExisted(username, email) == false) {
 		var user model.User = model.User{Name: username, PasswordMD5: util.GetMD5Hash(password), Email: email}
 		model.CreateUser(&user)
 		return true
@@ -163,14 +161,13 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
-
 type SignupRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Email string	`json:"email"`
+	Email    string    `json:"email"`
 }
 
-func signupFunc(w http.ResponseWriter, req *http.Request){
+func signupFunc(w http.ResponseWriter, req *http.Request) {
 	// get username & password
 	bodyBytes, _ := ioutil.ReadAll(req.Body)
 	requestBody := SignupRequest{}
@@ -183,15 +180,14 @@ func signupFunc(w http.ResponseWriter, req *http.Request){
 	}
 	success := confirmSignUp(requestBody)
 
-
 	var result string = "fail"
-	if (success){
+	if (success) {
 		result = "success"
 	}
 
 	statusResponse := struct {
 		Status string `json:"status"`
-	}{Status:result}
+	}{Status: result}
 
 	json.NewEncoder(w).Encode(statusResponse)
 }
@@ -216,7 +212,7 @@ func loginFunc(w http.ResponseWriter, req *http.Request) {
 	}
 
 	//generate token
-	expireToken := time.Now().Add(time.Hour * 48).Unix()
+	expireToken := time.Now().Add(time.Hour * 24 * 30).Unix()
 
 	claims := Claims{
 		userID,
@@ -234,8 +230,8 @@ func loginFunc(w http.ResponseWriter, req *http.Request) {
 
 	//output token
 	tokenResponse := struct {
-		Token string `json:"token"`
-    UserID  uint `json:"userId"`
+		Token  string `json:"token"`
+		UserID uint `json:"userId"`
 	}{signedToken, userID}
 	json.NewEncoder(w).Encode(tokenResponse)
 }

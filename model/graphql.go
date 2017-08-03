@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	_"time"
 	"github.com/graphql-go/graphql"
 	_"fmt"
@@ -67,25 +68,6 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 
-		//"findReportsByGroupName": &graphql.Field{
-		//	Type: graphql.NewList(reportType),
-		//	Args: graphql.FieldConfigArgument{
-		//		"name": &graphql.ArgumentConfig{
-		//			Type:        graphql.String,
-		//			Description: "...",
-		//		},
-		//	},
-		//	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-		//		idQuery, isOK := p.Args["name"].(string)
-		//		if isOK {
-		//			return findReportsByGroupName(idQuery), nil
-		//		}
-		//
-		//		return Group{}, nil
-		//	},
-		//
-		//},
-
 		"groups": &graphql.Field{
 			Type: graphql.NewList(groupType),
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -145,9 +127,11 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				if !isNameGroupExisted(name) {
 					insertGroup(name)
 					insertUserToGroupByID(int(authorContext.AuthorID), name);
-				}
-				return false, nil
 
+					return true, nil
+				} else {
+					return false, errors.New("Group name existed")
+				}
 			},
 		},
 
