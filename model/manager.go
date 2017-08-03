@@ -72,8 +72,8 @@ func findReportByID(id uint) (report Report) {
 	return
 }
 
-func updateSummerizationOfReport(summerization string, report *Report){
-	report.Summerization = summerization
+func updateSummaryOfReport(summary string, report *Report){
+	report.Summary = summary
 	db.Save(report)
 }
 

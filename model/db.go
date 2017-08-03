@@ -60,14 +60,14 @@ func Init() {
 		db.Create(&group3)
 
 		report1 := Report{
-			Summerization: "This is summerization of report 1",
-			UserID:        user1.ID,
-			GroupID:       group1.ID,
+			Summary: "This is summary of report 1",
+			UserID:  user1.ID,
+			GroupID: group1.ID,
 		}
 		report2 := Report{
-			Summerization: "This is summerization of report 2",
-			UserID:        user2.ID,
-			GroupID:       group1.ID,
+			Summary: "This is summary of report 2",
+			UserID:  user2.ID,
+			GroupID: group1.ID,
 		}
 
 		db.Create(&report1)

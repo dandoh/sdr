@@ -268,7 +268,7 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 					Type: graphql.NewList(graphql.Int),
 				},
 
-				"summerization": &graphql.ArgumentConfig{
+				"summary": &graphql.ArgumentConfig{
 					Type: graphql.String,
 				},
 
@@ -294,23 +294,21 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				}
 
 				reportId := p.Args["reportId"].(int)
-        summerization := ""
-        if (p.Args["summerization"] != nil) {
-          summerization = p.Args["summerization"].(string)
+        summary := ""
+        if p.Args["summary"] != nil {
+          summary = p.Args["summary"].(string)
         }
-				//summerization := p.Args["summerization"](string)
+				//summary := p.Args["summary"](string)
 				status := p.Args["status"].(string)
 
 				//authorContext := p.Context.Value("authorContext").(AuthorContext)
-				updateReport(reportId, contentTodoes, states, summerization , status)
+				updateReport(reportId, contentTodoes, states, summary, status)
 				return true, nil
 
 			},
 
 		},
 
-
-		
 
 		"createComment": &graphql.Field{
 			Type: graphql.Boolean,

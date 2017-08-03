@@ -7,12 +7,12 @@ import (
 
 type Report struct {
 	gorm.Model
-	Summerization string `gorm:"size:1000"`
-	UserID        uint `gorm:"index"`
-	Status        string
-	Todoes        []Todo
-	Comments      []Comment
-	GroupID       uint `gorm:"index"`
+	Summary  string `gorm:"size:1000"`
+	UserID   uint `gorm:"index"`
+	Status   string
+	Todoes   []Todo
+	Comments []Comment
+	GroupID  uint `gorm:"index"`
 }
 
 var reportType = graphql.NewObject(graphql.ObjectConfig{
@@ -38,12 +38,12 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 
-		"summerization": &graphql.Field{
+		"summary": &graphql.Field{
 			Type:        graphql.String,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				report := p.Source.(Report)
-				return report.Summerization, nil
+				return report.Summary, nil
 			},
 		},
 
@@ -78,7 +78,7 @@ func findReportsByGroupID(id int) (reports []Report) {
 }
 
 func createReport(contentTodoes []string, states []int, userId int, groupId int) {
-	var report Report = Report{UserID: uint(userId), GroupID: uint(groupId), Status:"Planned"} // TODO - fix this later
+	var report Report = Report{UserID: uint(userId), GroupID: uint(groupId), Status: "Planned"} // TODO - fix this later
 	insertReport(&report)
 	todoes := make([]Todo, len(contentTodoes))
 	for i, todo := range todoes {
@@ -90,9 +90,9 @@ func createReport(contentTodoes []string, states []int, userId int, groupId int)
 	return
 }
 
-func updateReport(reportId int, contentTodoes []string, states []int, summerization string, status string){
+func updateReport(reportId int, contentTodoes []string, states []int, summary string, status string) {
 	report := findReportByID(uint(reportId))
-	updateSummerizationOfReport(summerization, &report)
+	updateSummaryOfReport(summary, &report)
 	updateStatusOfReport(status, &report)
 
 	//Delete old to-do list

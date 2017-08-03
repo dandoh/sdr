@@ -13,7 +13,7 @@ CREATE UNIQUE INDEX user_id_uindex
 CREATE TABLE public.report
 (
   id            SERIAL PRIMARY KEY NOT NULL,
-  summerization VARCHAR(2000),
+  summary VARCHAR(2000),
   date          TIMESTAMP,
   fk_user_id    INT,
   CONSTRAINT report_user_id_fk FOREIGN KEY (fk_user_id) REFERENCES "user" (id)
