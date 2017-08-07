@@ -77,19 +77,48 @@ func findReportsByGroupID(id int) (reports []Report) {
 	return
 }
 
-func createReport(contentTodoes []string, states []int, userId int, groupId int) {
+//func createReport(contentTodoes []string, states []int, userId int, groupId int) {
+//	var report Report = Report{UserID: uint(userId), GroupID: uint(groupId), Status: "Planned"} // TODO - fix this later
+//	insertReport(&report)
+//	todoes := make([]Todo, len(contentTodoes))
+//	for i, todo := range todoes {
+//		todo.Content = contentTodoes[i]
+//		todo.State = states[i]
+//		todo.ReportID = report.ID
+//		insertTodo(&todo)
+//	}
+//	return
+//}
+
+func createReport(todoes []Todo, userId int, groupId int) {
 	var report Report = Report{UserID: uint(userId), GroupID: uint(groupId), Status: "Planned"} // TODO - fix this later
 	insertReport(&report)
-	todoes := make([]Todo, len(contentTodoes))
-	for i, todo := range todoes {
-		todo.Content = contentTodoes[i]
-		todo.State = states[i]
+
+	for _, todo := range todoes {
 		todo.ReportID = report.ID
 		insertTodo(&todo)
 	}
 	return
 }
 
+func updateReport(reportId int, todoes []Todo, summary string, status string) {
+	report := findReportByID(uint(reportId))
+	updateSummaryOfReport(summary, &report)
+	updateStatusOfReport(status, &report)
+
+	//Delete old to-do list
+	deleteTodoesOfReport(&report)
+
+	//Create new to-do list
+	for _, todo := range todoes {
+		todo.ReportID = uint(reportId)
+		insertTodo(&todo)
+	}
+	return
+}
+
+
+/*
 func updateReport(reportId int, contentTodoes []string, states []int, summary string, status string) {
 	report := findReportByID(uint(reportId))
 	updateSummaryOfReport(summary, &report)
@@ -108,3 +137,4 @@ func updateReport(reportId int, contentTodoes []string, states []int, summary st
 	}
 	return
 }
+*/
