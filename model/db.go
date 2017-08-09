@@ -84,6 +84,8 @@ func Init() {
 		Todo1 := Todo{
 			State:    0, // haven't done yet
 			Content:  " Content todo1",
+			EstimateTime: 60,
+			ActualTime:120,
 			ReportID: report1.ID,
 		}
 
