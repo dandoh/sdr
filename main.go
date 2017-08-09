@@ -77,5 +77,3 @@ func graphqlHandlerFunc(w http.ResponseWriter, r *http.Request) {
 	buff, _ = json.Marshal(result)
 	w.Write(buff)
 }
-
-

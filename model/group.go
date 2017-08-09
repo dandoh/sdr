@@ -9,7 +9,6 @@ type Group struct {
 	gorm.Model
 	Name    string `gorm:"size:255; unique_index" json:"name"`
 	Users   []User    `gorm:"many2many:user_group" json:"users"`
-	Reports []Report
 }
 
 var groupType = graphql.NewObject(graphql.ObjectConfig{
@@ -30,15 +29,6 @@ var groupType = graphql.NewObject(graphql.ObjectConfig{
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				group := p.Source.(Group)
 				return group.Name, nil
-			},
-		},
-
-		"reports": &graphql.Field{
-			Type:        graphql.NewList(reportType),
-			Description: "Which posts they have written.",
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				group := p.Source.(Group)
-				return findReportsByGroupID(int(group.ID)), nil
 			},
 		},
 

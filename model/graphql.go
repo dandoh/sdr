@@ -13,60 +13,27 @@ import (
 
 
 )
-/*
-func FillStruct(m map[string]interface{}, s interface{}) error {
-	structValue := reflect.ValueOf(s).Elem()
-
-	for name, value := range m {
-		structFieldValue := structValue.FieldByName(name)
-
-		if !structFieldValue.IsValid() {
-			return fmt.Errorf("No such field: %s in obj", name)
-		}
-
-		if !structFieldValue.CanSet() {
-			return fmt.Errorf("Cannot set %s field value", name)
-		}
-
-		val := reflect.ValueOf(value)
-		print("Types:")
-		print(structFieldValue.Type())
-		print(val.Type())
-
-		if structFieldValue.Type() != val.Type() {
-
-			//return errors.New("Provided value type didn't match obj field type")
-		}
-
-		structFieldValue.Set(val)
-	}
-	return nil
-}
-*/
 
 
-var todoInputType = graphql.NewInputObject(
-	graphql.InputObjectConfig{
-		Name: "todoInputType",
-		Fields: graphql.InputObjectConfigFieldMap{
-			"content": &graphql.InputObjectFieldConfig{
-				Type: graphql.String,
-			},
-			"state": &graphql.InputObjectFieldConfig{
-				Type: graphql.Int,
-			},
-			"estimateTime": &graphql.InputObjectFieldConfig{
-				Type: graphql.Int,
-			},
-			"actualTime": &graphql.InputObjectFieldConfig{
-				Type: graphql.Int,
-			},
-			"reportId": &graphql.InputObjectFieldConfig{
-				Type: graphql.Int,
-			},
-		},
-	},
-)
+//var TodoInputType = graphql.NewInputObject(
+//	graphql.InputObjectConfig{
+//		Name: "TodoInputType",
+//		Fields: graphql.InputObjectConfigFieldMap{
+//			"content": &graphql.InputObjectFieldConfig{
+//				Type: graphql.String,
+//			},
+//			"state": &graphql.InputObjectFieldConfig{
+//				Type: graphql.Int,
+//			},
+//			"estimateTime": &graphql.InputObjectFieldConfig{
+//				Type: graphql.Int,
+//			},
+//			"spentTime": &graphql.InputObjectFieldConfig{
+//				Type: graphql.Int,
+//			},
+//		},
+//	},
+//)
 
 
 var queryType = graphql.NewObject(graphql.ObjectConfig{
@@ -89,24 +56,6 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 
-		"reportsOfGroup": &graphql.Field{
-			Type: graphql.NewList(reportType),
-			Args: graphql.FieldConfigArgument{
-				"id": &graphql.ArgumentConfig{
-					Type:        graphql.Int,
-					Description: "...",
-				},
-			},
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				idQuery, isOK := p.Args["id"].(int)
-				if isOK {
-					return findReportsByGroupID(idQuery), nil
-				}
-
-				return []Report{}, nil
-			},
-
-		},
 		"report": &graphql.Field{
 			Type: reportType,
 			Args: graphql.FieldConfigArgument{
@@ -186,7 +135,6 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				if !isNameGroupExisted(name) {
 					insertGroup(name)
 					insertUserToGroupByID(int(authorContext.AuthorID), name);
-
 					return true, nil
 				} else {
 					return false, errors.New("Group name existed")
@@ -194,11 +142,11 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 
-		"addUserByEmail": &graphql.Field{
+		"addUserToGroup": &graphql.Field{
 			Type: graphql.Boolean,
 			Args: graphql.FieldConfigArgument{
 				"email": &graphql.ArgumentConfig{
-					Type: graphql.String,
+					Type: graphql.NewNonNull(graphql.String),
 				},
 
 				"groupId": &graphql.ArgumentConfig{
@@ -217,41 +165,25 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 
 		},
 
-		"updateNote": &graphql.Field{
-			Type: graphql.Boolean,
-			Args: graphql.FieldConfigArgument{
-				"note": &graphql.ArgumentConfig{
-					Type: graphql.String,
-				},
-
-			},
-
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				note := p.Args["note"].(string)
-				authorContext := p.Context.Value("authorContext").(AuthorContext)
-				updateUserNote(note, int(authorContext.AuthorID))
-				return true, nil
-			},
-		},
 
 		"deleteUserInGroup": &graphql.Field{
 			Type: graphql.Boolean,
 			Args: graphql.FieldConfigArgument{
 				"userEmail": &graphql.ArgumentConfig{
-					Type: graphql.String,
+					Type: graphql.NewNonNull(graphql.String),
 				},
 
-				"groupName": &graphql.ArgumentConfig{
-					Type: graphql.String,
+				"groupId": &graphql.ArgumentConfig{
+					Type: graphql.NewNonNull(graphql.Int),
 				},
 			},
 
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				email := p.Args["userEmail"].(string)
-				groupName := p.Args["groupName"].(string)
+				groupId := p.Args["groupId"].(int)
 
 				//deleteUserInGroup haven't been implemented yet!!!
-				deleteUserInGroupByEmail(email, groupName)
+				deleteUserInGroupByEmail(email, groupId)
 				return true, nil
 			},
 
@@ -259,101 +191,7 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 
-
-		"createReport": &graphql.Field{
-			Type: graphql.Boolean,
-			Args: graphql.FieldConfigArgument{
-				"todoes" : &graphql.ArgumentConfig{
-					Type : graphql.NewList(todoInputType),
-				},
-
-
-				"groupId": &graphql.ArgumentConfig{
-					Type: graphql.Int,
-				},
-
-
-			},
-
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				todoesArgs := p.Args["todoes"].([]interface{})
-				todoes := make([]Todo, len(todoesArgs))
-
-				for i := range todoesArgs {
-					todoes[i].Content = todoesArgs[i].(map[string]interface{})["content"].(string)
-					todoes[i].ActualTime = todoesArgs[i].(map[string]interface{})["actualTime"].(int)
-					todoes[i].EstimateTime = todoesArgs[i].(map[string]interface{})["estimateTime"].(int)
-					todoes[i].State = todoesArgs[i].(map[string]interface{})["state"].(int)
-					todoes[i].ReportID = uint(todoesArgs[i].(map[string]interface{})["reportId"].(int))
-
-				}
-
-				groupId := p.Args["groupId"].(int)
-				authorContext := p.Context.Value("authorContext").(AuthorContext)
-				//createReport(contentTodoes, states, int(authorContext.AuthorID), groupId)
-				createReport(todoes, int(authorContext.AuthorID), groupId)
-				return true, nil
-
-			},
-		},
-
-		"updateReport": &graphql.Field{
-			Type: graphql.Boolean,
-			Args: graphql.FieldConfigArgument{
-				"reportId": &graphql.ArgumentConfig{
-					Type: graphql.Int,
-				},
-
-				"todoes" : &graphql.ArgumentConfig{
-					Type : graphql.NewList(todoInputType),
-				},
-
-				"summary": &graphql.ArgumentConfig{
-					Type: graphql.String,
-				},
-
-				"status": &graphql.ArgumentConfig{
-					Type: graphql.String,
-				},
-
-			},
-
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-
-
-				reportId := p.Args["reportId"].(int)
-				summary := ""
-				status := ""
-				if p.Args["summary"] != nil {
-					summary = p.Args["summary"].(string)
-				}
-
-				if p.Args["status"] != nil {
-					status = p.Args["status"].(string)
-				}
-
-				todoesArgs := p.Args["todoes"].([]interface{})
-				todoes := make([]Todo, len(todoesArgs))
-
-				for i := range todoesArgs {
-					todoes[i].Content = todoesArgs[i].(map[string]interface{})["content"].(string)
-					todoes[i].ActualTime = todoesArgs[i].(map[string]interface{})["actualTime"].(int)
-					todoes[i].EstimateTime = todoesArgs[i].(map[string]interface{})["estimateTime"].(int)
-					todoes[i].State = todoesArgs[i].(map[string]interface{})["state"].(int)
-					todoes[i].ReportID = uint(todoesArgs[i].(map[string]interface{})["reportId"].(int))
-				}
-
-				//authorContext := p.Context.Value("authorContext").(AuthorContext)
-				updateReport(reportId, todoes, summary, status)
-				//updateReport(reportId, contentTodoes, states, summary, status)
-				return true, nil
-
-			},
-
-		},
-
-
-		"createComment": &graphql.Field{
+		"addComment": &graphql.Field{
 			Type: graphql.Boolean,
 			Args: graphql.FieldConfigArgument{
 				"content": &graphql.ArgumentConfig{
@@ -397,16 +235,6 @@ func InitType() {
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				report := p.Source.(Report)
 				return findUserByID(int(report.UserID)), nil
-			},
-
-
-		}, )
-
-	reportType.AddFieldConfig("group",
-		&graphql.Field{Type: groupType,
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				report := p.Source.(Report)
-				return findGroupByID(int(report.GroupID)), nil
 			},
 
 

@@ -7,12 +7,10 @@ import (
 
 type Report struct {
 	gorm.Model
-	Summary  string `gorm:"size:1000"`
+	Note     string `gorm:"size:1000"`
 	UserID   uint `gorm:"index"`
-	Status   string
 	Todoes   []Todo
 	Comments []Comment
-	GroupID  uint `gorm:"index"`
 }
 
 var reportType = graphql.NewObject(graphql.ObjectConfig{
@@ -29,21 +27,13 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 
-		"status": &graphql.Field{
-			Type:        graphql.String,
-			Description: "...",
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				report := p.Source.(Report)
-				return report.Status, nil
-			},
-		},
 
-		"summary": &graphql.Field{
+		"note": &graphql.Field{
 			Type:        graphql.String,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				report := p.Source.(Report)
-				return report.Summary, nil
+				return report.Note, nil
 			},
 		},
 
@@ -71,27 +61,8 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 
 })
 
-func findReportsByGroupID(id int) (reports []Report) {
-	group := findGroupByID(id)
-	reports = findReportsByGroup(&group);
-	return
-}
-
-//func createReport(contentTodoes []string, states []int, userId int, groupId int) {
-//	var report Report = Report{UserID: uint(userId), GroupID: uint(groupId), Status: "Planned"} // TODO - fix this later
-//	insertReport(&report)
-//	todoes := make([]Todo, len(contentTodoes))
-//	for i, todo := range todoes {
-//		todo.Content = contentTodoes[i]
-//		todo.State = states[i]
-//		todo.ReportID = report.ID
-//		insertTodo(&todo)
-//	}
-//	return
-//}
-
-func createReport(todoes []Todo, userId int, groupId int) {
-	var report Report = Report{UserID: uint(userId), GroupID: uint(groupId), Status: "Planned"} // TODO - fix this later
+func createReport(todoes []Todo, userId int) {
+	var report Report = Report{UserID: uint(userId)} // TODO - fix this later
 	insertReport(&report)
 
 	for _, todo := range todoes {
@@ -101,10 +72,9 @@ func createReport(todoes []Todo, userId int, groupId int) {
 	return
 }
 
-func updateReport(reportId int, todoes []Todo, summary string, status string) {
+func updateReport(reportId int, todoes []Todo, note string) {
 	report := findReportByID(uint(reportId))
-	updateSummaryOfReport(summary, &report)
-	updateStatusOfReport(status, &report)
+	updateNoteOfReport(note, &report)
 
 	//Delete old to-do list
 	deleteTodoesOfReport(&report)
@@ -118,23 +88,3 @@ func updateReport(reportId int, todoes []Todo, summary string, status string) {
 }
 
 
-/*
-func updateReport(reportId int, contentTodoes []string, states []int, summary string, status string) {
-	report := findReportByID(uint(reportId))
-	updateSummaryOfReport(summary, &report)
-	updateStatusOfReport(status, &report)
-
-	//Delete old to-do list
-	deleteTodoesOfReport(&report)
-
-	//Create new to-do list
-	todoes := make([]Todo, len(contentTodoes))
-	for i, todo := range todoes {
-		todo.Content = contentTodoes[i]
-		todo.State = states[i]
-		todo.ReportID = report.ID
-		insertTodo(&todo)
-	}
-	return
-}
-*/

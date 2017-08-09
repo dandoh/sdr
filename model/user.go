@@ -113,14 +113,14 @@ func insertUserToGroupByEmail(email string, groupID int) bool {
 
 func insertUserToGroupByID(userID int, groupName string) bool {
 	user := findUserByID(userID)
-	group := getGroupByName(groupName)
+	group := findGroupByName(groupName)
 	insertUserToGroup(&user, &group);
 	return true
 }
 
-func deleteUserInGroupByEmail(emailUser string, nameGroup string) bool {
+func deleteUserInGroupByEmail(emailUser string, groupId int) bool {
 	user := findUserByEmail(emailUser)
-	group := getGroupByName(nameGroup)
+	group := findGroupByID(groupId)
 	deleteUserInGroup(&user, &group);
 	return true
 }

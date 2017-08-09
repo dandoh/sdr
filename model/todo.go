@@ -7,11 +7,11 @@ import (
 
 type Todo struct {
 	gorm.Model
-	Content  string
-	State    int
+	Content      string
+	State        int
 	EstimateTime int
-	ActualTime int
-	ReportID uint `gorm:"index"`
+	SpentTime    int
+	ReportID     uint `gorm:"index"`
 }
 
 var todoType = graphql.NewObject(graphql.ObjectConfig{
@@ -47,21 +47,21 @@ var todoType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 		"estimateTime": &graphql.Field{
-			Type: graphql.Int,
+			Type:        graphql.Int,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				todo := p.Source.(Todo)
-				return todo.EstimateTime ,nil
+				return todo.EstimateTime, nil
 			},
 
 		},
 
-		"actualTime": &graphql.Field{
-			Type: graphql.Int,
+		"spentTime": &graphql.Field{
+			Type:        graphql.Int,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				todo := p.Source.(Todo)
-				return todo.ActualTime, nil
+				return todo.SpentTime, nil
 			},
 
 		},
@@ -70,6 +70,3 @@ var todoType = graphql.NewObject(graphql.ObjectConfig{
 	},
 
 })
-
-
-

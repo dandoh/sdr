@@ -54,20 +54,17 @@ func Init() {
 		group2 := Group{Name: "intern2"}
 		group3 := Group{Name: "intern3"}
 
-
 		db.Create(&group1)
 		db.Create(&group2)
 		db.Create(&group3)
 
 		report1 := Report{
-			Summary: "This is summary of report 1",
-			UserID:  user1.ID,
-			GroupID: group1.ID,
+			Note:   "This is note of report 1",
+			UserID: user1.ID,
 		}
 		report2 := Report{
-			Summary: "This is summary of report 2",
-			UserID:  user2.ID,
-			GroupID: group1.ID,
+			Note:   "This is note of report 2",
+			UserID: user2.ID,
 		}
 
 		db.Create(&report1)
@@ -82,23 +79,23 @@ func Init() {
 		db.Model(&user3).Association("Groups").Append(group2)
 
 		Todo1 := Todo{
-			State:    0, // haven't done yet
-			Content:  " Content todo1",
-			EstimateTime: 60,
-			ActualTime:120,
-			ReportID: report1.ID,
+			State:        0, // haven't done yet
+			Content:      " Content todo1",
+			EstimateTime: 150,
+			SpentTime:    120,
+			ReportID:     report1.ID,
 		}
 
 		Comment1 := Comment{
-			UserID: user1.ID,
+			UserID:   user1.ID,
 			ReportID: report2.ID,
-			Content: "This is content of comment!!!!!",
+			Content:  "This is content of comment!!!!!",
 		}
 
 		Comment2 := Comment{
-			UserID: user2.ID,
+			UserID:   user2.ID,
 			ReportID: report2.ID,
-			Content: "What 's up man!??",
+			Content:  "What 's up man!??",
 		}
 
 		db.Create(&Comment1)

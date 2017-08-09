@@ -72,15 +72,11 @@ func findReportByID(id uint) (report Report) {
 	return
 }
 
-func updateSummaryOfReport(summary string, report *Report){
-	report.Summary = summary
+func updateNoteOfReport(note string, report *Report){
+	report.Note = note
 	db.Save(report)
 }
 
-func updateStatusOfReport(status string, report *Report){
-	report.Status = status
-	db.Save(report)
-}
 
 func deleteTodoesOfReport(report *Report){
 	todoes := findTodoesOfReport(report)
@@ -116,13 +112,12 @@ func insertGroup(name string) {
 	db.Create(&Group{Name: name})
 }
 
-func getGroupByName(name string) (group Group) {
+func findGroupByName(name string) (group Group) {
 	db.Where("name = ?", name).First(&group)
 	return
 }
 
 func insertUserToGroup(user *User, group *Group) {
-	// TODO - check later
 	db.Model(user).Association("Groups").Append(group)
 }
 
@@ -137,7 +132,6 @@ func insertComment(comment *Comment) {
 
 
 
-//todo
 func insertTodo(todo *Todo){
 	db.Create(todo)
 	return
