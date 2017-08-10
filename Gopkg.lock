@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/corpix/uarand"
+  packages = ["."]
+  revision = "031be390f409fb4bac8fb299e3bcd101479f89f8"
+
+[[projects]]
   name = "github.com/dgrijalva/jwt-go"
   packages = ["."]
   revision = "d2709f9f1f31ebcda9651b03077758c1f3a0018c"
@@ -10,14 +16,20 @@
 [[projects]]
   name = "github.com/graphql-go/graphql"
   packages = [".","gqlerrors","language/ast","language/kinds","language/lexer","language/location","language/parser","language/printer","language/source","language/typeInfo","language/visitor"]
-  revision = "d114382b5e9f369f253062f18b5033cfff025f82"
-  version = "v7.1.0"
+  revision = "105a6c24e6fdaf4008e56d947115a1a13dc46430"
+  version = "v0.7.2"
 
 [[projects]]
   name = "github.com/graphql-go/handler"
   packages = ["."]
   revision = "07e3dd439c1f4ec14e685af7c48e8863bcc42c9d"
   version = "v0.1.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/icrowley/fake"
+  packages = ["."]
+  revision = "e64cc2cf92049a299f359734c6ea76073f2a8b2c"
 
 [[projects]]
   name = "github.com/jinzhu/gorm"
@@ -52,18 +64,18 @@
 [[projects]]
   name = "github.com/rs/cors"
   packages = ["."]
-  revision = "8dd4211afb5d08dbb39a533b9bb9e4b486351df6"
-  version = "v1.1"
+  revision = "7af7a1e09ba336d2ea14b1ce73bf693c6837dbf6"
+  version = "v1.2"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context"]
-  revision = "f5079bd7f6f74e23c4d65efa0f4ce14cbd6a3c0f"
+  revision = "1c05540f6879653db88113bc4a2b70aec4bd491f"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c29c9c13c7052ebf2bea7ab3f5939604482c8284762e533fc74178a77277bdb2"
+  inputs-digest = "4e84f37e87f2aa997db9285a9083076475757028dc0bd251c383fbc921d32cbd"
   solver-name = "gps-cdcl"
   solver-version = 1

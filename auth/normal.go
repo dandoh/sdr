@@ -13,7 +13,7 @@ import (
 )
 
 type LoginRequest struct {
-	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -24,16 +24,16 @@ type SignupRequest struct {
 }
 
 func confirmLogin(requestbody LoginRequest) (uint, bool) {
-	username := requestbody.Username
+	email := requestbody.Email
 	password := requestbody.Password
-	return model.GetUserID(username, password)
+	return model.GetUserID(email, password)
 }
 
 func confirmSignUp(requestbody SignupRequest) bool {
 	username := requestbody.Username
 	password := requestbody.Password
 	email := requestbody.Email
-	if (model.IsUserExisted(username, email) == false) {
+	if !model.IsUserExisted(username, email) {
 		var user model.User = model.User{Name: username, PasswordMD5: util.GetMD5Hash(password), Email: email}
 		model.CreateUser(&user)
 		return true
@@ -91,7 +91,7 @@ func LoginFunc(w http.ResponseWriter, req *http.Request) {
 
 	claims := Claims{
 		userID,
-		requestBody.Username,
+		requestBody.Email,
 		jwt.StandardClaims{
 			ExpiresAt: expireToken,
 			Issuer:    "localhost:8080",

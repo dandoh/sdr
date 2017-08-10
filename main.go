@@ -32,7 +32,7 @@ func setupMux() *http.ServeMux {
 
 	// login Handler
 	mux.Handle("/", http.FileServer(http.Dir("./public")))
-	mux.HandleFunc("/login", auth.LoginFunc)
+	mux.HandleFunc("/signin", auth.LoginFunc)
 	mux.HandleFunc("/signup", auth.SignupFunc)
 	// add in addContext middlware
 	mux.Handle("/graphql", appHandler)
