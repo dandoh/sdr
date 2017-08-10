@@ -1,4 +1,0 @@
-DBUSER=Dandoh
-DBPASSWORD=dandoh
-DBNAME=sdr_test
-SECRET_KEY=whateverdude

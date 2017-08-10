@@ -89,8 +89,8 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-func GetUserID(username string, password string) (uint, bool) {
-	user := findUserByName(username);
+func GetUserID(email string, password string) (uint, bool) {
+	user := findUserByEmail(email);
 	fmt.Printf("Received %s, expected %s", util.GetMD5Hash(password), user.PasswordMD5);
 	if user.PasswordMD5 == util.GetMD5Hash(password) {
 		return user.ID, true
