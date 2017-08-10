@@ -13,6 +13,7 @@ vendor/*
 project
 public/*
 .env
+/test/.test_env
 
 # misc
 .DS_Store

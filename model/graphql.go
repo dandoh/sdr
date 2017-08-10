@@ -106,6 +106,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 
 		},
 
+		/*
 		"note": &graphql.Field{
 			Type: graphql.String,
 
@@ -114,6 +115,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				return findUserByID(int(authorContext.AuthorID)).Note, nil
 			},
 		},
+		*/
 
 	},
 })
@@ -138,9 +140,9 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				purpose := p.Args["purpose"].(string)
 				authorContext := p.Context.Value("authorContext").(AuthorContext)
 				if !isNameGroupExisted(name) {
-					insertGroup(name, purpose)
-					insertUserToGroupByID(int(authorContext.AuthorID), name);
-					return true, nil
+					groupID := insertGroup(name, purpose)
+					insertUserToGroupByID(int(authorContext.AuthorID), int(groupID));
+					return groupID, nil
 				} else {
 					return false, errors.New("Group name existed")
 				}
@@ -162,12 +164,45 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				email := p.Args["email"].(string)
 				groupId := p.Args["groupId"].(int)
-				insertUserToGroupByEmail(email, groupId)
-				return true, nil
+				if (!isUserInGroupAlready(email, groupId)) {
+					insertUserToGroupByEmail(email, groupId)
+					return true, nil
+				} else {
+					return false, errors.New("User has joined in group already")
+				}
+
 			},
 
 		},
 
+		"addUsersToGroup": &graphql.Field{
+			Type: graphql.Boolean,
+			Args: graphql.FieldConfigArgument{
+				"emails": &graphql.ArgumentConfig{
+					Type: graphql.NewNonNull(graphql.String),
+				},
+
+				"groupId": &graphql.ArgumentConfig{
+					Type: graphql.NewNonNull(graphql.Int),
+				},
+			},
+
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				emailsArg := p.Args["emails"].([]interface{})
+
+				groupId := p.Args["groupId"].(int)
+
+				for _,email := range emailsArg {
+
+					insertUserToGroupByEmail(email.(string), groupId)
+					return true, nil
+				}
+				return  false, errors.New("There is a user")
+
+
+			},
+
+		},
 
 		"deleteUserInGroup": &graphql.Field{
 			Type: graphql.Boolean,

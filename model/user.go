@@ -13,7 +13,7 @@ type User struct {
 	PasswordMD5 string `gorm:"size:255"`
 	Email       string `gorm:"not null; unique"`
 	Token       string
-	Note        string    `gorm:"size:2000"`
+	//Note        string    `gorm:"size:2000"`
 	Groups      []Group `gorm:"many2many:user_group"`
 	Reports     []Report
 	Comments    []Comment
@@ -48,7 +48,7 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 			},
 
 		},
-
+/*
 		"note": &graphql.Field{
 			Type:        graphql.String,
 			Description: "...",
@@ -57,7 +57,7 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 				return user.Note, nil
 			},
 		},
-
+*/
 
 		"groups": &graphql.Field{
 			Type:        graphql.NewList(groupType),
@@ -111,9 +111,9 @@ func insertUserToGroupByEmail(email string, groupID int) bool {
 	return true
 }
 
-func insertUserToGroupByID(userID int, groupName string) bool {
+func insertUserToGroupByID(userID int, groupID int) bool {
 	user := findUserByID(userID)
-	group := findGroupByName(groupName)
+	group := findGroupByID(groupID)
 	insertUserToGroup(&user, &group);
 	return true
 }

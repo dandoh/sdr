@@ -1,5 +1,7 @@
 package model
 
+
+
 // User
 func findGroupsContainUser(user *User) (groups []Group) {
 	db.Model(user).Association("Groups").Find(&groups)
@@ -45,6 +47,20 @@ func findUserByName(name string) (user User) {
 	db.Where("name = ?", name).First(&user)
 	return
 }
+
+func isUserInGroupAlready(email string, groupId int) bool{
+	var users []User
+	db.Table("groups").Where("id = ?", groupId).Find(&users)
+	for _, user := range users {
+		if user.Email == email {
+			return true
+		}
+	}
+
+	return false
+
+}
+
 
 // Report
 func insertReport(report *Report){
@@ -108,8 +124,10 @@ func isNameGroupExisted(name string) bool {
 	return false
 }
 
-func insertGroup(name string, purpose string) {
-	db.Create(&Group{Name: name, Purpose: purpose})
+func insertGroup(name string, purpose string) uint {
+	var group Group = Group{Name: name, Purpose: purpose}
+	db.Create(&group)
+	return group.ID
 }
 
 func findGroupByName(name string) (group Group) {

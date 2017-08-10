@@ -10,6 +10,7 @@ import (
 	"github.com/dandoh/sdr/auth"
 	"github.com/dandoh/sdr/app"
 	"github.com/dandoh/sdr/model"
+	"fmt"
 )
 
 func main() {
@@ -43,5 +44,5 @@ func setupMux() *http.ServeMux {
 func setupServer() {
 	rootMux := setupMux();
 	c := cors.AllowAll().Handler(rootMux);
-	http.ListenAndServe(":8080", c)
+	fmt.Println(http.ListenAndServe(":8080", c))
 }
