@@ -108,8 +108,8 @@ func isNameGroupExisted(name string) bool {
 	return false
 }
 
-func insertGroup(name string) {
-	db.Create(&Group{Name: name})
+func insertGroup(name string, purpose string) {
+	db.Create(&Group{Name: name, Purpose: purpose})
 }
 
 func findGroupByName(name string) (group Group) {

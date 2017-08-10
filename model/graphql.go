@@ -127,13 +127,18 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				"name": &graphql.ArgumentConfig{
 					Type: graphql.NewNonNull(graphql.String),
 				},
+				"purpose": &graphql.ArgumentConfig{
+					Type: graphql.NewNonNull(graphql.String),
+				},
+
 			},
 
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				name := p.Args["name"].(string)
+				purpose := p.Args["purpose"].(string)
 				authorContext := p.Context.Value("authorContext").(AuthorContext)
 				if !isNameGroupExisted(name) {
-					insertGroup(name)
+					insertGroup(name, purpose)
 					insertUserToGroupByID(int(authorContext.AuthorID), name);
 					return true, nil
 				} else {
@@ -150,7 +155,7 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				},
 
 				"groupId": &graphql.ArgumentConfig{
-					Type: graphql.Int,
+					Type: graphql.NewNonNull(graphql.Int),
 				},
 			},
 
@@ -158,9 +163,7 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				email := p.Args["email"].(string)
 				groupId := p.Args["groupId"].(int)
 				insertUserToGroupByEmail(email, groupId)
-				//fmt.Print(emails)
 				return true, nil
-
 			},
 
 		},
@@ -182,7 +185,6 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				email := p.Args["userEmail"].(string)
 				groupId := p.Args["groupId"].(int)
 
-				//deleteUserInGroup haven't been implemented yet!!!
 				deleteUserInGroupByEmail(email, groupId)
 				return true, nil
 			},
@@ -221,7 +223,7 @@ var QLSchema, _ = graphql.NewSchema(graphql.SchemaConfig{
 	Mutation: mutateType,
 })
 
-// this is for cyclic dependencies
+// for cyclic dependencies
 func InitType() {
 	groupType.AddFieldConfig("users",
 		&graphql.Field{Type: graphql.NewList(userType),

@@ -20,8 +20,6 @@ type Claims struct {
 
 func RequireAuth(next http.Handler) http.Handler {
 	jwtSecret := []byte(os.Getenv("SECRET_KEY"));
-	fmt.Println("Here dude")
-	fmt.Println(jwtSecret)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		util.PrintBody(r)
 		// extract jwt

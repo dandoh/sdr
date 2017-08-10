@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
-	"sdr/util"
+	"github.com/dandoh/sdr/util"
 	"os"
 )
 
@@ -21,7 +21,9 @@ func Init() {
 	)
 	dbInfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", DBUSER, DBPASSWORD, DBNAME)
 	db, err = gorm.Open("postgres", dbInfo)
+	fmt.Println(dbInfo)
 	if err != nil {
+		fmt.Println(err)
 		panic("failed to connect database")
 	}
 

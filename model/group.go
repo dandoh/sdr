@@ -8,6 +8,7 @@ import (
 type Group struct {
 	gorm.Model
 	Name    string `gorm:"size:255; unique_index" json:"name"`
+	Purpose string `json:"purpose"`
 	Users   []User    `gorm:"many2many:user_group" json:"users"`
 }
 
@@ -29,6 +30,14 @@ var groupType = graphql.NewObject(graphql.ObjectConfig{
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				group := p.Source.(Group)
 				return group.Name, nil
+			},
+		},
+		"purpose": &graphql.Field{
+			Type:        graphql.String,
+			Description: "The group's purpose",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				group := p.Source.(Group)
+				return group.Purpose, nil
 			},
 		},
 
