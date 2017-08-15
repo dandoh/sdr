@@ -139,6 +139,17 @@ func IsUserExisted(name string, email string) bool {
 	return false
 }
 
+func isEmailExisted(email string) bool {
+	var user User
+	var count int
+	db.Where("email = ?", email).Find(&user).Count(&count)
+	if count > 0 {
+		return true
+	}
+	return false
+}
+
+
 func CreateUser(user *User){
 	db.Create(user)
 	return

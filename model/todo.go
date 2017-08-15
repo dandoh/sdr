@@ -70,3 +70,9 @@ var todoType = graphql.NewObject(graphql.ObjectConfig{
 	},
 
 })
+
+func addTodo(content string, state int, estimateTime int, spentTime int,reportId int) int{
+	var todo = Todo{Content:content, State:state, EstimateTime:estimateTime, SpentTime:spentTime, ReportID:uint(reportId)}
+	insertTodo(&todo)
+	return int(todo.ID)
+}

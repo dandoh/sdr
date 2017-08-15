@@ -40,8 +40,8 @@ var commentType = graphql.NewObject(graphql.ObjectConfig{
 
 })
 
-func createComment(content string, userID uint, reportID uint) bool {
+func createComment(content string, userID uint, reportID uint) int {
 	comment := Comment{Content: content, UserID: userID, ReportID: reportID}
 	insertComment(&comment)
-	return true
+	return int(comment.ID)
 }

@@ -3,6 +3,8 @@ package model
 
 
 // User
+
+
 func findGroupsContainUser(user *User) (groups []Group) {
 	db.Model(user).Association("Groups").Find(&groups)
 	return
@@ -50,8 +52,10 @@ func findUserByName(name string) (user User) {
 
 func isUserInGroupAlready(email string, groupId int) bool{
 	var users []User
-	db.Table("groups").Where("id = ?", groupId).Find(&users)
+	group := findGroupByID(groupId)
+	users = findUsersByGroup(&group)
 	for _, user := range users {
+
 		if user.Email == email {
 			return true
 		}
@@ -63,6 +67,9 @@ func isUserInGroupAlready(email string, groupId int) bool{
 
 
 // Report
+
+
+
 func insertReport(report *Report){
 	db.Create(report)
 	return
@@ -72,6 +79,9 @@ func findTodoesOfReport(report *Report) (todoes []Todo) {
 	db.Model(report).Association("Todoes").Find(&todoes)
 	return
 }
+
+
+
 
 func findCommentsOfReport(report *Report) (comments []Comment) {
 	db.Model(report).Association("Comments").Find(&comments)
@@ -88,8 +98,7 @@ func findReportByID(id uint) (report Report) {
 	return
 }
 
-func updateNoteOfReport(note string, report *Report){
-	report.Note = note
+func saveReport(report *Report){
 	db.Save(report)
 }
 
@@ -100,6 +109,24 @@ func deleteTodoesOfReport(report *Report){
 		db.Model(report).Association("Todoes").Delete(todo)
 	}
 	return
+}
+
+func deleteTodo(todoId int) bool{
+
+	todo := findTodoById(todoId)
+	report := findReportByID(uint(todo.ReportID))
+	db.Model(report).Association("Todoes").Delete(todo)
+	return true
+}
+
+func updateTodo(todoId int, content string, state int, estimateTime int, spentTime int) bool{
+	todo := findTodoById(todoId)
+	todo.Content = content
+	todo.State = state
+	todo.EstimateTime = estimateTime
+	todo.SpentTime = spentTime
+	db.Save(todo)
+	return true
 }
 
 
@@ -152,5 +179,12 @@ func insertComment(comment *Comment) {
 
 func insertTodo(todo *Todo){
 	db.Create(todo)
+	return
+}
+
+//Todo
+
+func findTodoById(todoId int) (todo Todo){
+	db.Where("id = ?", todoId).First(&todo)
 	return
 }

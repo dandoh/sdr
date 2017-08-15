@@ -1,5 +1,4 @@
 import json
-import urllib
 import http.client
 
 class ClientAPI(object):
@@ -15,9 +14,11 @@ class ClientAPI(object):
         # store token for later uses
         self.token = response["token"]
         self.user_id = response["userId"]
-        print(self.token)
+
         
     def send(self, query):
+        #print('Sending query:')
+        print(query)
         headers = {'Authorization': 'Bearer ' + self.token}
         self.client.request('POST', '/graphql', json.dumps({'query': query}), headers)
         response = json.loads(self.client.getresponse().

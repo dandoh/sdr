@@ -32,6 +32,7 @@ func Init() {
 	if dev {
 		db.DropTable(&User{})
 		db.DropTable(&Group{})
+		db.DropTable("user_group")
 		db.DropTable(&Report{})
 		db.DropTable(&Comment{})
 		db.DropTable(&Todo{})
@@ -75,10 +76,9 @@ func Init() {
 		db.Model(&user1).Association("Groups").Append(group1)
 		db.Model(&user1).Association("Groups").Append(group3)
 		db.Model(&user1).Association("Groups").Append(group2)
-		db.Model(&user2).Association("Groups").Append(group3)
+		//db.Model(&user2).Association("Groups").Append(group3)
 		db.Model(&user2).Association("Groups").Append(group1)
 		db.Model(&user3).Association("Groups").Append(group1)
-		db.Model(&user3).Association("Groups").Append(group2)
 
 		Todo1 := Todo{
 			State:        0, // haven't done yet

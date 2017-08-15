@@ -60,7 +60,7 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 
 
 })
-
+/*
 func createReport(todoes []Todo, userId int) {
 	var report Report = Report{UserID: uint(userId)} // TODO - fix this later
 	insertReport(&report)
@@ -71,7 +71,14 @@ func createReport(todoes []Todo, userId int) {
 	}
 	return
 }
+*/
 
+func createReport(userId int) int{
+	var report Report = Report{UserID: uint(userId)}
+	insertReport(&report)
+	return  int(report.ID)
+}
+/*
 func updateReport(reportId int, todoes []Todo, note string) {
 	report := findReportByID(uint(reportId))
 	updateNoteOfReport(note, &report)
@@ -86,5 +93,11 @@ func updateReport(reportId int, todoes []Todo, note string) {
 	}
 	return
 }
-
+*/
+func updateNoteOfReport(note string, reportId int) string{
+	report := findReportByID(uint(reportId))
+	report.Note = note
+	saveReport(&report)
+	return report.Note
+}
 
