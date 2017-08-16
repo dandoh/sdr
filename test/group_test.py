@@ -13,6 +13,11 @@ class TestGroup(unittest.TestCase):
     def test_upper(self):
         self.assertEqual('foo'.upper(), 'FOO')
 
+
+
+
+
+
     def test_add_new_group(self):
         ##########Generate data for valid group###########
         faker = Factory.create()
@@ -159,13 +164,13 @@ class TestGroup(unittest.TestCase):
     def test_delete_user_in_group(self):
 
         email1 = "De@gmail.com"
-
+        groupId = 1
         #Delete this user in group 1
         delete_user_in_group = """
         mutation{
             deleteUserInGroup(email: "%s", groupId: %d)
         }
-        """%(email1, 1)
+        """%(email1, groupId)
         res = self.client.send(delete_user_in_group)
 
         self.assertTrue(res['data']['deleteUserInGroup'])
@@ -175,10 +180,82 @@ class TestGroup(unittest.TestCase):
         mutation{
             deleteUserInGroup(email: "%s", groupId: %d)
         }
-        """%(email1, 1)
+        """%(email1, groupId)
         res = self.client.send(delete_user_in_group)
 
         self.assertFalse(res['data']['deleteUserInGroup'])
+
+
+        # Add user again
+        add_user_to_group_mutation = """
+        mutation{
+         addUserToGroup(email: "%s", groupId: %d)
+        }
+        """ %(email1, groupId)
+
+        res = self.client.send(add_user_to_group_mutation)
+
+
+
+
+
+
+    def test_query_group(self):
+        #Test query group
+        groupId = 1
+
+        get_group_query="""
+        query{
+            group(id : %d){
+                groupId
+                name
+                purpose
+                users{
+                    userId
+                    name
+                    groups{
+                        name
+                        purpose
+                    }
+                }
+            }
+        }
+        """%(groupId)
+
+        res = self.client.send(get_group_query)
+        users = res['data']['group']['users']
+        userIds = [x['userId'] for x in users]
+
+
+        data = res['data']['group']
+        self.assertIsNotNone(res['data'], msg=None)
+
+        #test groups
+        get_groups_query="""
+        query{
+            groups{
+                groupId
+                name
+                users{
+                    userId
+                    name
+                    groups{
+                        name
+                    }
+                    avatar
+                }
+                purpose
+            }
+        }
+        """
+
+        res = self.client.send(get_groups_query)
+        self.assertIsNotNone(res['data'], msg=None)
+
+
+
+
+
 
 
 

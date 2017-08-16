@@ -18,7 +18,7 @@ class ClientAPI(object):
         
     def send(self, query):
         #print('Sending query:')
-        print(query)
+        #print(query)
         headers = {'Authorization': 'Bearer ' + self.token}
         self.client.request('POST', '/graphql', json.dumps({'query': query}), headers)
         response = json.loads(self.client.getresponse().

@@ -1,6 +1,6 @@
 package model
 
-
+import "time"
 
 // User
 
@@ -67,7 +67,13 @@ func isUserInGroupAlready(email string, groupId int) bool{
 
 
 // Report
-
+func findReportTodayByUserId(userId int) (report Report){
+	day := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(),
+		0,0,0,0,time.Now().Local().Location())
+	print("this is day : ", day.String())
+	db.Where("created_at > ?", day).Last(&report)
+	return
+}
 
 
 func insertReport(report *Report){

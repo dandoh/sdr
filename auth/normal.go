@@ -10,6 +10,7 @@ import (
 	"github.com/dandoh/sdr/model"
 	"time"
 	"os"
+	"github.com/enodata/faker"
 )
 
 type LoginRequest struct {
@@ -34,7 +35,8 @@ func confirmSignUp(requestbody SignupRequest) bool {
 	password := requestbody.Password
 	email := requestbody.Email
 	if !model.IsUserExisted(username, email) {
-		var user model.User = model.User{Name: username, PasswordMD5: util.GetMD5Hash(password), Email: email}
+		avatar := faker.Avatar().String()
+		var user model.User = model.User{Name: username, PasswordMD5: util.GetMD5Hash(password), Email: email, Avarta:avatar}
 		model.CreateUser(&user)
 		return true
 	}

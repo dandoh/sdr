@@ -59,16 +59,28 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 		"report": &graphql.Field{
 			Type: reportType,
 			Args: graphql.FieldConfigArgument{
-				"id": &graphql.ArgumentConfig{
+				"reportId": &graphql.ArgumentConfig{
 					Type:        graphql.Int,
 					Description: "...",
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				idQuery, isOK := p.Args["id"].(int)
+				idQuery, isOK := p.Args["reportId"].(int)
 				if isOK {
 					return findReportByID(uint(idQuery)), nil
 				}
+
+				return Report{}, nil
+			},
+
+		},
+
+		"reportToday": &graphql.Field{
+			Type: reportType,
+
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				authorContext := p.Context.Value("authorContext").(AuthorContext)
+				return findReportTodayByUserId(int(authorContext.AuthorID)), nil
 
 				return Report{}, nil
 			},
