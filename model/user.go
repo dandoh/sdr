@@ -12,8 +12,7 @@ type User struct {
 	Name        string `gorm:"size:255; unique"`
 	PasswordMD5 string `gorm:"size:255"`
 	Email       string `gorm:"not null; unique"`
-	Token       string
-	Avarta		string
+	Avatar      string
 	Groups      []Group `gorm:"many2many:user_group"`
 	Reports     []Report
 	Comments    []Comment
@@ -54,7 +53,7 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				user := p.Source.(User)
-				return user.Avarta, nil
+				return user.Avatar, nil
 			},
 		},
 /*

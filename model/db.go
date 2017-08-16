@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/dandoh/sdr/util"
 	"os"
+	"github.com/enodata/faker"
 )
 
 var db *gorm.DB
@@ -46,27 +47,27 @@ func Init() {
 
 	if dev {
 
-		user1 := User{Name: "Nhan", Email: "Dandoh@gmail.com", PasswordMD5: util.GetMD5Hash("haha")}
-		user2 := User{Name: "De", Email: "De@gmail.com", PasswordMD5: util.GetMD5Hash("haha")}
-		user3 := User{Name: "Shiki", Email: "Shiki@gmail.com", PasswordMD5: util.GetMD5Hash("haha")}
+		user1 := User{Name: "Nhan", Email: "Dandoh@gmail.com", PasswordMD5: util.GetMD5Hash("haha"), Avatar: faker.Avatar().String()}
+		user2 := User{Name: "De", Email: "De@gmail.com", PasswordMD5: util.GetMD5Hash("haha"), Avatar: faker.Avatar().String()}
+		user3 := User{Name: "Shiki", Email: "Shiki@gmail.com", PasswordMD5: util.GetMD5Hash("haha"), Avatar: faker.Avatar().String()}
 		db.Create(&user1)
 		db.Create(&user2)
 		db.Create(&user3)
 
-		group1 := Group{Name: "intern"}
-		group2 := Group{Name: "intern2"}
-		group3 := Group{Name: "intern3"}
+		group1 := Group{Name: faker.Company().Name()}
+		group2 := Group{Name: faker.Company().Name()}
+		group3 := Group{Name: faker.Company().Name()}
 
 		db.Create(&group1)
 		db.Create(&group2)
 		db.Create(&group3)
 
 		report1 := Report{
-			Note:   "This is note of report 1",
+			Note:   faker.Lorem().Sentence(5),
 			UserID: user1.ID,
 		}
 		report2 := Report{
-			Note:   "This is note of report 2",
+			Note:  faker.Lorem().Sentence(5),
 			UserID: user2.ID,
 		}
 
@@ -82,7 +83,7 @@ func Init() {
 
 		Todo1 := Todo{
 			State:        0, // haven't done yet
-			Content:      " Content todo1",
+			Content:      faker.Company().Bs(),
 			EstimateTime: 150,
 			SpentTime:    120,
 			ReportID:     report1.ID,
@@ -91,13 +92,13 @@ func Init() {
 		Comment1 := Comment{
 			UserID:   user1.ID,
 			ReportID: report2.ID,
-			Content:  "This is content of comment!!!!!",
+			Content:  faker.Company().Bs(),
 		}
 
 		Comment2 := Comment{
 			UserID:   user2.ID,
 			ReportID: report2.ID,
-			Content:  "What 's up man!??",
+			Content:  faker.Company().Bs(),
 		}
 
 		db.Create(&Comment1)

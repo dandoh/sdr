@@ -36,7 +36,7 @@ func confirmSignUp(requestbody SignupRequest) bool {
 	email := requestbody.Email
 	if !model.IsUserExisted(username, email) {
 		avatar := faker.Avatar().String()
-		var user model.User = model.User{Name: username, PasswordMD5: util.GetMD5Hash(password), Email: email, Avarta:avatar}
+		var user model.User = model.User{Name: username, PasswordMD5: util.GetMD5Hash(password), Email: email, Avatar: avatar}
 		model.CreateUser(&user)
 		return true
 	}

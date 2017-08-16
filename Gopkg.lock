@@ -2,16 +2,16 @@
 
 
 [[projects]]
-  branch = "master"
-  name = "github.com/corpix/uarand"
-  packages = ["."]
-  revision = "031be390f409fb4bac8fb299e3bcd101479f89f8"
-
-[[projects]]
   name = "github.com/dgrijalva/jwt-go"
   packages = ["."]
   revision = "d2709f9f1f31ebcda9651b03077758c1f3a0018c"
   version = "v3.0.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/enodata/faker"
+  packages = [".","locales"]
+  revision = "42b4c440d9e55560eba634971aac3b622138a9ac"
 
 [[projects]]
   name = "github.com/graphql-go/graphql"
@@ -24,12 +24,6 @@
   packages = ["."]
   revision = "07e3dd439c1f4ec14e685af7c48e8863bcc42c9d"
   version = "v0.1.0"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/icrowley/fake"
-  packages = ["."]
-  revision = "e64cc2cf92049a299f359734c6ea76073f2a8b2c"
 
 [[projects]]
   name = "github.com/jinzhu/gorm"
@@ -76,6 +70,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4e84f37e87f2aa997db9285a9083076475757028dc0bd251c383fbc921d32cbd"
+  inputs-digest = "1bc8091ed01d8cda3b0fd74bf3bff2a7912061e6d8f873b931b74e74ada9fe80"
   solver-name = "gps-cdcl"
   solver-version = 1
