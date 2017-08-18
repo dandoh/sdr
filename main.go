@@ -11,7 +11,7 @@ import (
 	"github.com/dandoh/sdr/app"
 	"github.com/dandoh/sdr/model"
 	"fmt"
-	"github.com/dandoh/sdr/trigger"
+
 )
 
 func main() {

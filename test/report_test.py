@@ -13,17 +13,10 @@ class TestReport(unittest.TestCase):
 
     def test_report_todo_comment_note(self):
 
-        ####Create new report and Get new reportID
-        create_report_mutation = """
-        mutation {
-            createReport
-        }
-        """
-        res = self.client.send(create_report_mutation)
-        reportId = res['data']['createReport']
-        print("report cua tao: ", reportId)
+
 
         ####Test get report today##############
+        reportId = 1
         get_reportToday_query = """
         query{
             reportToday{
@@ -82,8 +75,10 @@ class TestReport(unittest.TestCase):
         res = self.client.send(create_comment_mutation)
 
         res = self.client.send(get_todo_query)
-
-        self.assertTrue(res['data']['report']['comments'][0]['content'] == comment)
+        data = res['data']['report']['comments']
+        data = [x['content'] for x in data]
+        print("comment: ", res)
+        self.assertTrue(comment in data)
 
 
 
@@ -105,7 +100,8 @@ class TestReport(unittest.TestCase):
 
 
         res = self.client.send(get_todo_query)
-        todo = res['data']['report']['todoes'][0]
+        leng = len(res['data']['report']['todoes'])
+        todo = res['data']['report']['todoes'][leng-1]
 
         self.assertTrue(todo['todoId']== todoId and todo['state']== state and todo['content'] == content
                     and todo['estimateTime'] == estimateTime and todo['spentTime'] == spentTime)
@@ -126,7 +122,8 @@ class TestReport(unittest.TestCase):
         res = self.client.send(update_todo_mutation)
 
         res = self.client.send(get_todo_query)
-        todo = res['data']['report']['todoes'][0]
+        leng= len (res['data']['report']['todoes'])
+        todo = res['data']['report']['todoes'][leng-1]
 
         self.assertTrue(todo['todoId']== todoId and todo['state']== newState and todo['content'] == newContent
                         and todo['estimateTime'] == newEstimateTime and todo['spentTime'] == newSpentTime)
@@ -145,7 +142,9 @@ class TestReport(unittest.TestCase):
 
         print("deleteTodo :   ", res)
         todoes = res['data']['report']['todoes']
-        self.assertTrue(len(todoes) == 0)
+        todoIds = [x['todoId'] for x in todoes]
+        self.assertFalse(todoId in todoIds)
+
 
 
     def test_reports(self):
@@ -211,6 +210,7 @@ class TestReport(unittest.TestCase):
         }
         """%(groupId)
 
+        print("report today groups: ", res)
         res = self.client.send(get_reports_to_day_of_group)
         self.assertIsNotNone(res['data'], msg = None)
         #print(res)

@@ -62,18 +62,6 @@ func Init() {
 		db.Create(&group2)
 		db.Create(&group3)
 
-		report1 := Report{
-			Note:   faker.Lorem().Sentence(5),
-			UserID: user1.ID,
-		}
-		report2 := Report{
-			Note:  faker.Lorem().Sentence(5),
-			UserID: user2.ID,
-		}
-
-		db.Create(&report1)
-		db.Create(&report2)
-
 		db.Model(&user1).Association("Groups").Append(group1)
 		db.Model(&user1).Association("Groups").Append(group3)
 		db.Model(&user1).Association("Groups").Append(group2)
@@ -81,29 +69,190 @@ func Init() {
 		db.Model(&user2).Association("Groups").Append(group1)
 		db.Model(&user3).Association("Groups").Append(group1)
 
-		Todo1 := Todo{
+		todayreport1 := Report{
+			Note:   faker.Lorem().Sentence(5),
+			UserID: user1.ID,
+		}
+		todayreport2 := Report{
+			Note:  faker.Lorem().Sentence(5),
+			UserID: user2.ID,
+		}
+		todayreport3 := Report{
+			Note: faker.Lorem().Sentence(10),
+			UserID: user3.ID,
+		}
+
+
+		db.Create(&todayreport1)
+		db.Create(&todayreport2)
+		db.Create(&todayreport3)
+
+
+		//////////////////////////////// Today Report 1////////////////////////
+		Todo1_1 := Todo{
 			State:        0, // haven't done yet
 			Content:      faker.Company().Bs(),
 			EstimateTime: 150,
 			SpentTime:    120,
-			ReportID:     report1.ID,
+			ReportID:     todayreport1.ID,
 		}
 
-		Comment1 := Comment{
+		Todo1_2 := Todo{
+			State:        0, // haven't done yet
+			Content:      faker.Company().Bs(),
+			EstimateTime: 100,
+			SpentTime:    100,
+			ReportID:     todayreport1.ID,
+		}
+
+		Todo1_3 := Todo{
+			State:        0, // haven't done yet
+			Content:      faker.Company().Bs(),
+			EstimateTime: 130,
+			SpentTime:    130,
+			ReportID:     todayreport1.ID,
+		}
+
+
+
+		Comment1_1 := Comment{
 			UserID:   user1.ID,
-			ReportID: report2.ID,
+			ReportID: todayreport1.ID,
 			Content:  faker.Company().Bs(),
 		}
 
-		Comment2 := Comment{
+		Comment1_2 := Comment{
 			UserID:   user2.ID,
-			ReportID: report2.ID,
+			ReportID: todayreport1.ID,
 			Content:  faker.Company().Bs(),
 		}
 
-		db.Create(&Comment1)
-		db.Create(&Comment2)
-		db.Create(&Todo1)
+
+		Comment1_3 := Comment{
+			UserID:   user3.ID,
+			ReportID: todayreport1.ID,
+			Content:  faker.Company().Bs(),
+		}
+
+
+		db.Create(&Todo1_1)
+		db.Create(&Todo1_2)
+		db.Create(&Todo1_3)
+		db.Create(&Comment1_1)
+		db.Create(&Comment1_2)
+		db.Create(&Comment1_3)
+		///////////////////////////////////Today report 2//////////////
+
+		Todo2_1 := Todo{
+			State:        0, // haven't done yet
+			Content:      faker.Company().Bs(),
+			EstimateTime: 150,
+			SpentTime:    120,
+			ReportID:     todayreport2.ID,
+		}
+
+		Todo2_2 := Todo{
+			State:        0, // haven't done yet
+			Content:      faker.Company().Bs(),
+			EstimateTime: 100,
+			SpentTime:    100,
+			ReportID:     todayreport2.ID,
+		}
+
+		Todo2_3 := Todo{
+			State:        0, // haven't done yet
+			Content:      faker.Company().Bs(),
+			EstimateTime: 130,
+			SpentTime:    130,
+			ReportID:     todayreport2.ID,
+		}
+
+
+
+		Comment2_1 := Comment{
+			UserID:   user1.ID,
+			ReportID: todayreport2.ID,
+			Content:  faker.Company().Bs(),
+		}
+
+		Comment2_2 := Comment{
+			UserID:   user2.ID,
+			ReportID: todayreport2.ID,
+			Content:  faker.Company().Bs(),
+		}
+
+
+		Comment2_3 := Comment{
+			UserID:   user3.ID,
+			ReportID: todayreport2.ID,
+			Content:  faker.Company().Bs(),
+		}
+
+
+		db.Create(&Todo2_1)
+		db.Create(&Todo2_2)
+		db.Create(&Todo2_3)
+		db.Create(&Comment2_1)
+		db.Create(&Comment2_2)
+		db.Create(&Comment2_3)
+		/////////////////////////////////Today report 3////////////
+
+
+
+		Todo3_1 := Todo{
+			State:        0, // haven't done yet
+			Content:      faker.Company().Bs(),
+			EstimateTime: 150,
+			SpentTime:    120,
+			ReportID:     todayreport3.ID,
+		}
+
+		Todo3_2 := Todo{
+			State:        0, // haven't done yet
+			Content:      faker.Company().Bs(),
+			EstimateTime: 100,
+			SpentTime:    100,
+			ReportID:     todayreport3.ID,
+		}
+
+		Todo3_3 := Todo{
+			State:        0, // haven't done yet
+			Content:      faker.Company().Bs(),
+			EstimateTime: 130,
+			SpentTime:    130,
+			ReportID:     todayreport3.ID,
+		}
+
+
+
+		Comment3_1 := Comment{
+			UserID:   user1.ID,
+			ReportID: todayreport3.ID,
+			Content:  faker.Company().Bs(),
+		}
+
+		Comment3_2 := Comment{
+			UserID:   user2.ID,
+			ReportID: todayreport3.ID,
+			Content:  faker.Company().Bs(),
+		}
+
+
+		Comment3_3 := Comment{
+			UserID:   user3.ID,
+			ReportID: todayreport3.ID,
+			Content:  faker.Company().Bs(),
+		}
+
+
+		db.Create(&Todo3_1)
+		db.Create(&Todo3_2)
+		db.Create(&Todo3_3)
+		db.Create(&Comment3_1)
+		db.Create(&Comment3_2)
+		db.Create(&Comment3_3)
+
+
 	}
 
 }
