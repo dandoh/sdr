@@ -11,6 +11,7 @@ import (
 	"github.com/dandoh/sdr/app"
 	"github.com/dandoh/sdr/model"
 	"fmt"
+	"github.com/dandoh/sdr/trigger"
 )
 
 func main() {
@@ -21,8 +22,8 @@ func main() {
 
 	model.Init()
 	model.InitType()
-
 	setupServer()
+
 }
 
 func setupMux() *http.ServeMux {
@@ -35,6 +36,7 @@ func setupMux() *http.ServeMux {
 	mux.Handle("/", http.FileServer(http.Dir("./public")))
 	mux.HandleFunc("/signin", auth.LoginFunc)
 	mux.HandleFunc("/signup", auth.SignupFunc)
+
 	// add in addContext middlware
 	mux.Handle("/graphql", appHandler)
 

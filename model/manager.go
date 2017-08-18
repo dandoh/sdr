@@ -4,7 +4,10 @@ import "time"
 
 // User
 
-
+func findAllUsers() (users []User){
+	db.Find(&users)
+	return
+}
 func findGroupsContainUser(user *User) (groups []Group) {
 	db.Model(user).Association("Groups").Find(&groups)
 	return
@@ -78,6 +81,17 @@ func findReportTodayByUserId(userId int) (report Report){
 		0,0,0,0,time.Now().Local().Location())
 	print("this is day : ", day.String())
 	db.Where("user_id = ? AND created_at > ?", userId, day).Last(&report)
+	return
+}
+
+func findReportYestedayByUserId(userId int)(report Report){
+	yesterday := time.Now().AddDate(0, 0, -1)
+	yesterday = time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(),
+		0,0,0,0,yesterday.Local().Location())
+	day := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(),
+		0,0,0,0,time.Now().Local().Location())
+	print("this is yesterday : ", day.String())
+	db.Where("user_id = ? AND created_at BETWEEN ? AND ?", userId, yesterday, day).First(&report)
 	return
 }
 
@@ -198,5 +212,28 @@ func insertTodo(todo *Todo){
 
 func findTodoById(todoId int) (todo Todo){
 	db.Where("id = ?", todoId).First(&todo)
+	return
+}
+
+//Subscribe
+func findSubscribeByIds(userId int, reportId int)(subscribe Subscribe){
+	db.Where("user_id = ? AND report_id = ?", userId, reportId).First(&subscribe)
+	return
+}
+
+func saveSubscribe(userId int, reportId int) bool{
+	var subscribe Subscribe
+	var count int
+	db.Where("user_id = ?  AND report_id = ?", userId, reportId).Find(&subscribe).Count(&count)
+	if (count != 0) {
+		db.Save(subscribe)
+	} else {
+		db.Create(&Subscribe{UserId: uint(userId), ReportId: uint(reportId), NumberCommentsNotSeen: 0})
+	}
+	return true
+}
+
+func findSubscribesOfUser(userId int) (subscribe []Subscribe){
+	db.Where("user_id = ?", userId).Find(&subscribe)
 	return
 }

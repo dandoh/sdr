@@ -43,5 +43,6 @@ var commentType = graphql.NewObject(graphql.ObjectConfig{
 func createComment(content string, userID uint, reportID uint) int {
 	comment := Comment{Content: content, UserID: userID, ReportID: reportID}
 	insertComment(&comment)
+	saveSubscribe(int(userID), int(reportID))
 	return int(comment.ID)
 }

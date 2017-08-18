@@ -60,40 +60,32 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 
 
 })
-/*
-func createReport(todoes []Todo, userId int) {
-	var report Report = Report{UserID: uint(userId)} // TODO - fix this later
-	insertReport(&report)
 
-	for _, todo := range todoes {
-		todo.ReportID = report.ID
-		insertTodo(&todo)
-	}
-	return
-}
-*/
 
-func createReport(userId int) int{
+
+func createTodayReportForUser(userId int) int{
 	var report Report = Report{UserID: uint(userId)}
+	yesterdayReport := findReportYestedayByUserId(userId)
+	yesterdayTodoes := findTodoesOfReport(&yesterdayReport)
 	insertReport(&report)
+	for _,todo := range yesterdayTodoes{
+		if todo.State == 0{
+			insertTodo(&Todo{Content: todo.Content, State: todo.State,
+				EstimateTime: todo.EstimateTime, SpentTime: todo.SpentTime, ReportID: report.ID})
+		}
+	}
+
 	return  int(report.ID)
 }
-/*
-func updateReport(reportId int, todoes []Todo, note string) {
-	report := findReportByID(uint(reportId))
-	updateNoteOfReport(note, &report)
 
-	//Delete old to-do list
-	deleteTodoesOfReport(&report)
-
-	//Create new to-do list
-	for _, todo := range todoes {
-		todo.ReportID = uint(reportId)
-		insertTodo(&todo)
+func createTodayReportForAllUsers() bool{
+	users := findAllUsers()
+	for _, user := range users{
+		createTodayReportForUser(int(user.ID))
 	}
-	return
+	return true
 }
-*/
+
 func updateNoteOfReport(note string, reportId int) string{
 	report := findReportByID(uint(reportId))
 	report.Note = note

@@ -10,6 +10,7 @@ type Group struct {
 	Name    string `gorm:"size:255; unique_index" json:"name"`
 	Purpose string `json:"purpose"`
 	Users   []User    `gorm:"many2many:user_group" json:"users"`
+	Subscribe []Subscribe
 }
 
 var groupType = graphql.NewObject(graphql.ObjectConfig{

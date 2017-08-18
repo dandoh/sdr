@@ -174,16 +174,14 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 
 		},
 
-		/*
-		"note": &graphql.Field{
-			Type: graphql.String,
-
+		"subscribes" : &graphql.Field{
+			Type: graphql.NewList(subscribeType),
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				authorContext := p.Context.Value("authorContext").(AuthorContext)
-				return findUserByID(int(authorContext.AuthorID)).Note, nil
+				return getAllSubscribesOfUser(int(authorContext.AuthorID)), nil
 			},
+
 		},
-		*/
 
 	},
 })
@@ -312,16 +310,6 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 
 		},
 
-		"createReport": &graphql.Field{
-			Type: graphql.Int,
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				authorContext := p.Context.Value("authorContext").(AuthorContext)
-				return createReport(int(authorContext.AuthorID)), nil
-			},
-
-
-		},
-
 		"addTodo": &graphql.Field{
 			Type: graphql.Int,
 			Args: graphql.FieldConfigArgument{
@@ -442,6 +430,21 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 
+		"saveSubscribe": &graphql.Field{
+			Type: graphql.String,
+			Args: graphql.FieldConfigArgument{
+				"reportId": &graphql.ArgumentConfig{
+					Type: graphql.Int,
+				},
+			},
+
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				reportId := p.Args["reportId"].(int)
+				authorContext := p.Context.Value("authorContext").(AuthorContext)
+				return saveSubscribe(int(authorContext.AuthorID), reportId), nil
+			},
+		},
+
 
 	},
 })
@@ -469,6 +472,26 @@ func InitType() {
 
 
 		}, )
+
+
+	subscribeType.AddFieldConfig("user",
+		&graphql.Field{Type: userType,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				subscribe := p.Source.(Subscribe)
+				return findUserByID(int(subscribe.UserId)), nil
+			},
+		}, )
+
+
+	reportType.AddFieldConfig("report",
+		&graphql.Field{Type: reportType,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				subscribe := p.Source.(Subscribe)
+				return findReportByID(subscribe.ReportId), nil
+			},
+
+		}, )
+
 
 	commentType.AddFieldConfig("user", &graphql.Field{
 		Type:        userType,

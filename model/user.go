@@ -17,6 +17,7 @@ type User struct {
 	Groups      []Group `gorm:"many2many:user_group"`
 	Reports     []Report
 	Comments    []Comment
+	Subscribe []Subscribe
 }
 
 var userType = graphql.NewObject(graphql.ObjectConfig{
@@ -92,6 +93,15 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				user := p.Source.(User)
 				return findCommentsOfUser(&user), nil
+			},
+		},
+
+		"todayReport": &graphql.Field{
+			Type:        graphql.NewList(commentType),
+			Description: "....",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				user := p.Source.(User)
+				return findReportTodayByUserId(int(user.ID)), nil
 			},
 		},
 		//Password and Token haven't been declared.
@@ -183,4 +193,14 @@ func getOldReportsByUserId(userId int, fromDate string, toDate string) (reports 
 
 
 	return findOldReportsOfUser(userId, t1, t2), nil
+}
+
+func getAllSubscribesOfUser(userId int) (out []Subscribe){
+	subscribes := findSubscribesOfUser(userId)
+	for _,subscribe := range subscribes{
+		if getNumCommentsNotSeenInSubscribe(int(subscribe.UserId), int(subscribe.ReportId)) != 0{
+			out = append(out, subscribe)
+		}
+	}
+	return
 }
