@@ -5,6 +5,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/graphql-go/graphql"
 	"fmt"
+	"time"
 )
 
 type User struct {
@@ -161,4 +162,25 @@ func isEmailExisted(email string) bool {
 func CreateUser(user *User){
 	db.Create(user)
 	return
+}
+
+func getAllReportsOfUser(userId int) (reports []Report){
+	user := findUserByID(userId)
+	return findReportsOfUser(&user)
+}
+
+func getOldReportsByUserId(userId int, fromDate string, toDate string) (reports []Report, err error){
+	t1, err1 := time.Parse("2006-01-02", fromDate)
+	t2, err2 := time.Parse("2006-01-02", toDate)
+
+	if err1 != nil{
+		return nil, err1
+	}
+
+	if err2 != nil {
+		return nil, err2
+	}
+
+
+	return findOldReportsOfUser(userId, t1, t2), nil
 }

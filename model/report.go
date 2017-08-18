@@ -101,5 +101,15 @@ func updateNoteOfReport(note string, reportId int) string{
 	return report.Note
 }
 
+func getAllReportsTodayByGroupId(groupId int) (reports []Report){
+	users := findUsersByGroupID(groupId)
+	for _, user := range users{
+		 reportToday := findReportTodayByUserId(int(user.ID))
+		if reportToday.ID != 0{
+			reports = append(reports, reportToday)
+		}
+	}
 
+	return
+}
 

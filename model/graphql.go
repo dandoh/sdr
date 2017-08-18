@@ -75,6 +75,46 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 
 		},
 
+		"reports" : &graphql.Field{
+			Type: graphql.NewList(reportType),
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				authorContext := p.Context.Value("authorContext").(AuthorContext)
+				return getAllReportsOfUser(int(authorContext.AuthorID)), nil
+
+			},
+
+		},
+
+		"oldReports": &graphql.Field{
+			Type: graphql.NewList(reportType),
+			Args: graphql.FieldConfigArgument{
+				"fromDate": &graphql.ArgumentConfig{
+					Type:        graphql.String,
+					Description: "...",
+				},
+
+				"toDate": &graphql.ArgumentConfig{
+					Type:        graphql.String,
+					Description: "...",
+				},
+
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				authorContext := p.Context.Value("authorContext").(AuthorContext)
+				fromDate := p.Args["fromDate"].(string)
+				toDate := p.Args["toDate"].(string)
+				reports, err := getOldReportsByUserId(int(authorContext.AuthorID), fromDate, toDate)
+
+				if err != nil {
+					return nil, errors.New("Date must be in form yyyy-mm-dd")
+				}
+
+				return reports, nil
+
+			},
+
+		},
+
 		"reportToday": &graphql.Field{
 			Type: reportType,
 
@@ -83,6 +123,22 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				return findReportTodayByUserId(int(authorContext.AuthorID)), nil
 
 				return Report{}, nil
+			},
+
+		},
+
+		"reportsTodayOfGroup": &graphql.Field{
+			Type: graphql.NewList(reportType),
+			Args:graphql.FieldConfigArgument{
+				"groupId": &graphql.ArgumentConfig{
+					Type:        graphql.Int,
+					Description: "...",
+				},
+			},
+
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				groupId := p.Args["groupId"].(int)
+				return getAllReportsTodayByGroupId(int(groupId)), nil
 			},
 
 		},

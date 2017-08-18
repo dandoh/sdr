@@ -148,6 +148,72 @@ class TestReport(unittest.TestCase):
         self.assertTrue(len(todoes) == 0)
 
 
+    def test_reports(self):
+
+        ##Test get all reports of user
+        get_all_reports_of_user="""
+        query{
+            reports{
+                reportId
+                todoes{
+                    estimateTime
+                }
+            }
+        }
+        """
+        res = self.client.send(get_all_reports_of_user)
+        print(res)
+        self.assertIsNotNone(res['data'], msg = None)
+
+        ##Test get all old reports in (date1, date2)
+        fromDate = "2017-08-16"
+        toDate = "2017-08-17"
+        get_all_old_reports_in_period="""
+        query{
+            oldReports(fromDate: "%s", toDate: "%s"){
+                reportId
+            }
+        }
+        """%(fromDate, toDate)
+
+        res = self.client.send(get_all_old_reports_in_period)
+
+        self.assertTrue(len(res['data']['oldReports']) ==0 )
+
+
+        ##Change the date
+        toDate = "3000-08-17"
+
+        get_all_old_reports_in_period="""
+        query{
+            oldReports(fromDate: "%s", toDate: "%s"){
+                reportId
+            }
+        }
+        """%(fromDate, toDate)
+
+
+        res = self.client.send(get_all_old_reports_in_period)
+
+        self.assertFalse(len(res['data']['oldReports']) ==0 )
+
+        ####Test get reports Today of group
+        groupId = 1
+        get_reports_to_day_of_group="""
+        query{
+            reportsTodayOfGroup(groupId: %d){
+                reportId
+                user{
+                    userId
+                    name
+                }
+            }
+        }
+        """%(groupId)
+
+        res = self.client.send(get_reports_to_day_of_group)
+        self.assertIsNotNone(res['data'], msg = None)
+        #print(res)
 
 
 

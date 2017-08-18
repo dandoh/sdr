@@ -67,11 +67,17 @@ func isUserInGroupAlready(email string, groupId int) bool{
 
 
 // Report
+func findOldReportsOfUser(userId int, t1 time.Time, t2 time.Time)(reports []Report){
+	db.Table("reports").Where("user_id = ? AND created_at BETWEEN ? AND ?", userId, t1, t2).Find(&reports)
+	return
+}
+
+
 func findReportTodayByUserId(userId int) (report Report){
 	day := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(),
 		0,0,0,0,time.Now().Local().Location())
 	print("this is day : ", day.String())
-	db.Where("created_at > ?", day).Last(&report)
+	db.Where("user_id = ? AND created_at > ?", userId, day).Last(&report)
 	return
 }
 

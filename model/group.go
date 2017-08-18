@@ -49,3 +49,4 @@ func findGroupsByUserID(id int) (groups []Group) {
 	groups = findGroupsByUser(&user);
 	return
 }
+
