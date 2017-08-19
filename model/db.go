@@ -37,6 +37,7 @@ func Init() {
 		db.DropTable(&Report{})
 		db.DropTable(&Comment{})
 		db.DropTable(&Todo{})
+		db.DropTable(&Subscribe{})
 	}
 
 	db.AutoMigrate(&User{})
@@ -44,6 +45,7 @@ func Init() {
 	db.AutoMigrate(&Report{})
 	db.AutoMigrate(&Comment{})
 	db.AutoMigrate(&Todo{})
+	db.AutoMigrate(&Subscribe{})
 
 	if dev {
 
@@ -253,7 +255,84 @@ func Init() {
 		db.Create(&Comment3_3)
 
 
+		Subscribe1_1 := Subscribe{
+			UserId: user1.ID,
+			ReportId: todayreport1.ID,
+			NumberCommentsNotSeen: 0,
+		}
+
+		Subscribe1_2 := Subscribe{
+			UserId: user1.ID,
+			ReportId: todayreport2.ID,
+			NumberCommentsNotSeen: 0,
+		}
+		Subscribe1_3 := Subscribe{
+			UserId: user1.ID,
+			ReportId: todayreport3.ID,
+			NumberCommentsNotSeen: 0,
+		}
+		Subscribe2_1 := Subscribe{
+			UserId: user2.ID,
+			ReportId: todayreport1.ID,
+			NumberCommentsNotSeen: 0,
+		}
+		Subscribe2_2 := Subscribe{
+			UserId: user2.ID,
+			ReportId: todayreport2.ID,
+			NumberCommentsNotSeen: 0,
+		}
+		Subscribe2_3 := Subscribe{
+			UserId: user2.ID,
+			ReportId: todayreport3.ID,
+			NumberCommentsNotSeen: 0,
+		}
+		Subscribe3_1 := Subscribe{
+			UserId: user3.ID,
+			ReportId: todayreport1.ID,
+			NumberCommentsNotSeen: 0,
+		}
+		Subscribe3_2 := Subscribe{
+			UserId: user3.ID,
+			ReportId: todayreport2.ID,
+			NumberCommentsNotSeen: 0,
+		}
+		Subscribe3_3 := Subscribe{
+			UserId: user3.ID,
+			ReportId: todayreport3.ID,
+			NumberCommentsNotSeen: 0,
+		}
+
+		db.Create(&Subscribe1_1)
+		db.Create(&Subscribe1_2)
+		db.Create(&Subscribe1_3)
+		db.Create(&Subscribe2_1)
+		db.Create(&Subscribe2_2)
+		db.Create(&Subscribe2_3)
+		db.Create(&Subscribe3_1)
+		db.Create(&Subscribe3_2)
+		db.Create(&Subscribe3_3)
+
+		Subscribe1_1.LastUpdatedAt = Subscribe1_1.UpdatedAt
+		db.Save(&Subscribe1_1)
+		Subscribe1_2.LastUpdatedAt = Subscribe1_2.UpdatedAt
+		db.Save(&Subscribe1_2)
+		Subscribe1_3.LastUpdatedAt = Subscribe1_3.UpdatedAt
+		db.Save(&Subscribe1_3)
+		Subscribe2_1.LastUpdatedAt = Subscribe2_1.UpdatedAt
+		db.Save(&Subscribe2_1)
+		Subscribe2_2.LastUpdatedAt = Subscribe2_2.UpdatedAt
+		db.Save(&Subscribe2_2)
+		Subscribe2_3.LastUpdatedAt = Subscribe2_3.UpdatedAt
+		db.Save(&Subscribe2_3)
+		Subscribe3_1.LastUpdatedAt = Subscribe3_1.UpdatedAt
+		db.Save(&Subscribe3_1)
+		Subscribe3_2.LastUpdatedAt = Subscribe3_2.UpdatedAt
+		db.Save(&Subscribe3_2)
+		Subscribe3_3.LastUpdatedAt = Subscribe3_3.UpdatedAt
+		db.Save(&Subscribe3_3)
 	}
+
+
 
 }
 

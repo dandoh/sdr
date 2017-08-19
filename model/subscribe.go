@@ -6,13 +6,14 @@ import (
 	"github.com/graphql-go/graphql"
 	_"fmt"
 
-
+	"time"
 )
 
 type Subscribe struct {
 	gorm.Model
-	UserId       uint
-	ReportId uint
+	UserId       uint `gorm:"index"`
+	ReportId 	 uint `gorm:"index"`
+	LastUpdatedAt time.Time
 	NumberCommentsNotSeen int
 }
 
@@ -54,14 +55,14 @@ var subscribeType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-func getNumCommentsNotSeenInSubscribe(userId int, reportId int) int{
+func getUpdatedSubscribe(userId int, reportId int) Subscribe{
 	var num int
 	subscribe := findSubscribeByIds(userId, reportId)
 	db.Model(&Comment{}).Where("report_id = ? AND updated_at > ?",
-		reportId, subscribe.UpdatedAt).Count(&num)
+		reportId, subscribe.LastUpdatedAt).Count(&num)
 
 	subscribe.NumberCommentsNotSeen = num
 	db.Save(&subscribe)
-	return subscribe.NumberCommentsNotSeen
+	return subscribe
 }
 

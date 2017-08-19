@@ -17,7 +17,7 @@ type User struct {
 	Groups      []Group `gorm:"many2many:user_group"`
 	Reports     []Report
 	Comments    []Comment
-	Subscribe []Subscribe
+	Subscribes []Subscribe
 }
 
 var userType = graphql.NewObject(graphql.ObjectConfig{
@@ -198,8 +198,9 @@ func getOldReportsByUserId(userId int, fromDate string, toDate string) (reports 
 func getAllSubscribesOfUser(userId int) (out []Subscribe){
 	subscribes := findSubscribesOfUser(userId)
 	for _,subscribe := range subscribes{
-		if getNumCommentsNotSeenInSubscribe(int(subscribe.UserId), int(subscribe.ReportId)) != 0{
-			out = append(out, subscribe)
+		updatedSubscribe := getUpdatedSubscribe(int(subscribe.UserId), int(subscribe.ReportId))
+		if updatedSubscribe.NumberCommentsNotSeen != 0{
+			out = append(out, updatedSubscribe)
 		}
 	}
 	return

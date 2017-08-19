@@ -8,7 +8,8 @@ class TestGroup(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.client = client.ClientAPI()
+        cls.client = client.ClientAPI("Dandoh@gmail.com")
+
 
     def test_upper(self):
         self.assertEqual('foo'.upper(), 'FOO')

@@ -11,6 +11,7 @@ type Report struct {
 	UserID   uint `gorm:"index"`
 	Todoes   []Todo
 	Comments []Comment
+	Subscribes []Subscribe
 }
 
 var reportType = graphql.NewObject(graphql.ObjectConfig{

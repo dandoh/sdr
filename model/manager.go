@@ -221,14 +221,16 @@ func findSubscribeByIds(userId int, reportId int)(subscribe Subscribe){
 	return
 }
 
-func saveSubscribe(userId int, reportId int) bool{
+func saveSubscribe(userId int, reportId int, lastUpdatedAt time.Time) bool{
 	var subscribe Subscribe
 	var count int
 	db.Where("user_id = ?  AND report_id = ?", userId, reportId).Find(&subscribe).Count(&count)
 	if (count != 0) {
-		db.Save(subscribe)
+		subscribe.LastUpdatedAt = lastUpdatedAt
+		subscribe.NumberCommentsNotSeen = 0
+		db.Save(&subscribe)
 	} else {
-		db.Create(&Subscribe{UserId: uint(userId), ReportId: uint(reportId), NumberCommentsNotSeen: 0})
+		db.Create(&Subscribe{UserId: uint(userId), ReportId: uint(reportId), NumberCommentsNotSeen: 0, LastUpdatedAt:lastUpdatedAt})
 	}
 	return true
 }

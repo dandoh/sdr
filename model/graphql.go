@@ -10,6 +10,7 @@ import (
 	"fmt"
 
 	_"github.com/jinzhu/gorm"
+	"time"
 )
 
 //var TodoInputType = graphql.NewInputObject(
@@ -453,7 +454,7 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				reportId := p.Args["reportId"].(int)
 				authorContext := p.Context.Value("authorContext").(AuthorContext)
-				return saveSubscribe(int(authorContext.AuthorID), reportId), nil
+				return saveSubscribe(int(authorContext.AuthorID), reportId, time.Now()), nil
 			},
 		},
 
