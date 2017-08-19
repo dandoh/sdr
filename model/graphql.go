@@ -10,10 +10,7 @@ import (
 	"fmt"
 
 	_"github.com/jinzhu/gorm"
-
-
 )
-
 
 //var TodoInputType = graphql.NewInputObject(
 //	graphql.InputObjectConfig{
@@ -35,7 +32,6 @@ import (
 //	},
 //)
 
-
 var queryType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "RootQuery",
 	Fields: graphql.Fields{
@@ -43,7 +39,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 			Type: groupType,
 			Args: graphql.FieldConfigArgument{
 				"id": &graphql.ArgumentConfig{
-					Type: graphql.Int     ,
+					Type:        graphql.Int,
 					Description: "...",
 				},
 			},
@@ -74,8 +70,24 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 			},
 
 		},
+		"user": &graphql.Field{
+			Type: userType,
+			Args: graphql.FieldConfigArgument{
+				"userId": &graphql.ArgumentConfig{
+					Type: graphql.Int,
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				idQuery, isOK := p.Args["userId"].(int)
+				if isOK {
+					return findUserByID(idQuery), nil
+				}
 
-		"reports" : &graphql.Field{
+				return User{}, nil
+			},
+		},
+
+		"reports": &graphql.Field{
 			Type: graphql.NewList(reportType),
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				authorContext := p.Context.Value("authorContext").(AuthorContext)
@@ -129,7 +141,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 
 		"reportsTodayOfGroup": &graphql.Field{
 			Type: graphql.NewList(reportType),
-			Args:graphql.FieldConfigArgument{
+			Args: graphql.FieldConfigArgument{
 				"groupId": &graphql.ArgumentConfig{
 					Type:        graphql.Int,
 					Description: "...",
@@ -174,7 +186,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 
 		},
 
-		"subscribes" : &graphql.Field{
+		"subscribes": &graphql.Field{
 			Type: graphql.NewList(subscribeType),
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				authorContext := p.Context.Value("authorContext").(AuthorContext)
@@ -263,7 +275,7 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 				groupId := p.Args["groupId"].(int)
 
 				numNewUser := 0
-				for _,email := range emailsArg {
+				for _, email := range emailsArg {
 					if (!isUserInGroupAlready(email.(string), groupId) && isEmailExisted(email.(string))) {
 						insertUserToGroupByEmail(email.(string), groupId)
 						numNewUser ++
@@ -274,11 +286,11 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 					return true, nil
 				}
 
-				if (numNewUser != 0){
+				if (numNewUser != 0) {
 					return false, errors.New("There is one or more unvalid emails")
 				}
 
-				return  false, errors.New("All emails have existed")
+				return false, errors.New("All emails have existed")
 
 			},
 
@@ -299,7 +311,7 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				email := p.Args["email"].(string)
 				groupId := p.Args["groupId"].(int)
-				if (isUserInGroupAlready(email, groupId)){
+				if (isUserInGroupAlready(email, groupId)) {
 					deleteUserInGroupByEmail(email, groupId)
 					return true, nil
 				}
@@ -411,7 +423,7 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 
-		"updateNote" : &graphql.Field{
+		"updateNote": &graphql.Field{
 			Type: graphql.String,
 			Args: graphql.FieldConfigArgument{
 				"note": &graphql.ArgumentConfig{
@@ -473,7 +485,6 @@ func InitType() {
 
 		}, )
 
-
 	subscribeType.AddFieldConfig("user",
 		&graphql.Field{Type: userType,
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -481,7 +492,6 @@ func InitType() {
 				return findUserByID(int(subscribe.UserId)), nil
 			},
 		}, )
-
 
 	reportType.AddFieldConfig("report",
 		&graphql.Field{Type: reportType,
@@ -491,7 +501,6 @@ func InitType() {
 			},
 
 		}, )
-
 
 	commentType.AddFieldConfig("user", &graphql.Field{
 		Type:        userType,

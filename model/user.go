@@ -97,7 +97,7 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 		"todayReport": &graphql.Field{
-			Type:        graphql.NewList(commentType),
+			Type:        reportType,
 			Description: "....",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				user := p.Source.(User)
