@@ -36,6 +36,15 @@ import (
 var queryType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "RootQuery",
 	Fields: graphql.Fields{
+		"users": &graphql.Field{
+			Type: graphql.NewList(userType),
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				return findAllUsers(), nil
+			},
+		},
+
+
+
 		"group": &graphql.Field{
 			Type: groupType,
 			Args: graphql.FieldConfigArgument{
@@ -195,6 +204,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 			},
 
 		},
+
 
 	},
 })
