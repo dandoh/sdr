@@ -494,7 +494,7 @@ func InitType() {
 			},
 		}, )
 
-	reportType.AddFieldConfig("report",
+	subscribeType.AddFieldConfig("report",
 		&graphql.Field{Type: reportType,
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				subscribe := p.Source.(Subscribe)
