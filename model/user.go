@@ -108,6 +108,17 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
+
+func getUserCommentLastInReport(reportId int) (user User, isExist bool){
+	var comment Comment
+	var count int
+	db.Where("report_id = ?", reportId).Last(&comment).Count(&count)
+	if count != 0{
+		return findUserByID(int(comment.UserID)), true
+	}
+	return User{}, false
+}
+
 func GetUserID(email string, password string) (uint, bool) {
 	user := findUserByEmail(email);
 	fmt.Printf("Received %s, expected %s", util.GetMD5Hash(password), user.PasswordMD5);

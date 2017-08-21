@@ -56,12 +56,15 @@ class TestReport(unittest.TestCase):
                 }
                 comments{
                     content
+                    createdAt
                 }
+                createdAt
             }
         }
         """%(reportId)
 
         res = self.client.send(get_todo_query)
+        print("hahahahah", res)
         self.assertTrue(res['data']['report']['note'] == note)
 
 

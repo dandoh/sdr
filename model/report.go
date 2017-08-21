@@ -58,6 +58,15 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 
+		"createdAt" : &graphql.Field{
+			Type:        graphql.String,
+			Description: "...",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				report := p.Source.(Report)
+				return report.CreatedAt.String(), nil
+			},
+		},
+
 	},
 
 

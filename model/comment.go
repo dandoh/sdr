@@ -34,6 +34,15 @@ var commentType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 
+		"createdAt": &graphql.Field{
+			Type:        graphql.String,
+			Description: "...",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				comment := p.Source.(Comment)
+				return comment.CreatedAt.String(), nil
+			},
+		},
+
 
 	},
 

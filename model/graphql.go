@@ -486,6 +486,7 @@ func InitType() {
 
 		}, )
 
+	/*
 	subscribeType.AddFieldConfig("user",
 		&graphql.Field{Type: userType,
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -502,6 +503,8 @@ func InitType() {
 			},
 
 		}, )
+
+		*/
 
 	commentType.AddFieldConfig("user", &graphql.Field{
 		Type:        userType,

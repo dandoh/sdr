@@ -23,8 +23,14 @@ class TestSubscribe(unittest.TestCase):
         get_subscribes_query ="""
         query{
             subscribes{
-                reportId
+                report{
+                    reportId
+                }
+                userCommentLast{
+                    userId
+                }
                 numberCommentsNotSeen
+                lastUpdatedAt
             }
         }
         """
@@ -61,6 +67,8 @@ class TestSubscribe(unittest.TestCase):
         res = self.client3.send(add_comment_mutation)
         res = self.client.send(get_subscribes_query)
         self.assertTrue(res['data']['subscribes'][0]['numberCommentsNotSeen'] == 3)
+        print("hahahahah", res)
+        self.assertTrue(res['data']['subscribes'][0]['userCommentLast']['userId'] == 3)
 
         ##When myself comment to the report
         res = self.client.send(add_comment_mutation)

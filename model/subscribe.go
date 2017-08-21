@@ -7,6 +7,7 @@ import (
 	_"fmt"
 
 	"time"
+
 )
 
 type Subscribe struct {
@@ -22,6 +23,7 @@ var subscribeType = graphql.NewObject(graphql.ObjectConfig{
 	Name:        "Subscribe",
 	Description: "...",
 	Fields: graphql.Fields{
+		/*
 		"userId": &graphql.Field{
 			Type:        graphql.Int,
 			Description: "...",
@@ -39,6 +41,27 @@ var subscribeType = graphql.NewObject(graphql.ObjectConfig{
 				return subscribe.ReportId, nil
 			},
 		},
+		*/
+
+		"userCommentLast":&graphql.Field{
+			Type: userType,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				subscribe := p.Source.(Subscribe)
+				user, isExist := getUserCommentLastInReport(int(subscribe.ReportId))
+				if (isExist){
+					return user, nil
+				}
+				return User{}, nil
+			},
+		},
+
+		"report" : &graphql.Field{
+			Type: reportType,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				subscribe := p.Source.(Subscribe)
+				return findReportByID(subscribe.ReportId), nil
+			},
+		},
 
 		"numberCommentsNotSeen": &graphql.Field{
 			Type:        graphql.Int,
@@ -46,6 +69,15 @@ var subscribeType = graphql.NewObject(graphql.ObjectConfig{
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				subscribe := p.Source.(Subscribe)
 				return subscribe.NumberCommentsNotSeen, nil
+			},
+		},
+
+		"lastUpdatedAt" : &graphql.Field{
+			Type:        graphql.String,
+			Description: "...",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				subscribe := p.Source.(Subscribe)
+				return subscribe.LastUpdatedAt.String(), nil
 			},
 		},
 
