@@ -27,8 +27,32 @@ class TestSubscribe(unittest.TestCase):
         print(res)
         self.assertTrue(len(res['data']['users']) == 3)
 
+    def test_change_group_Info(self):
+        groupId = 1
+        get_all_user_in_group="""
+        query{
+            usersOfGroup(groupId : %d){
+                userId
+            }
+        }
+        """%(groupId)
 
+        res = self.client.send(get_all_user_in_group)
+        self.assertTrue(len(res['data']['usersOfGroup']) == 3)
 
+        change_group_info="""
+        mutation{
+            changeGroupInfo(groupId : %d, groupName : "%s", purpose : "%s", emails : ["%s", "%s"])
+        }
+        """%(1, "groupnewHaha", "Purposehahahaha", "De@gmail.com", "Shiki@gmail.com")
+
+        res = self.client.send(change_group_info)
+
+        print("change group info respone:", res)
+
+        res = self.client.send(get_all_user_in_group)
+        print(res)
+        self.assertTrue(len(res['data']['usersOfGroup']) == 2)
 
 
 

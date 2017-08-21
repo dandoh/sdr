@@ -307,6 +307,47 @@ var mutateType = graphql.NewObject(graphql.ObjectConfig{
 
 		},
 
+		"changeGroupInfo": &graphql.Field{
+			Type: graphql.Boolean,
+			Args: graphql.FieldConfigArgument{
+				"groupId": &graphql.ArgumentConfig{
+					Type: graphql.NewNonNull(graphql.Int),
+				},
+
+				"groupName": &graphql.ArgumentConfig{
+					Type: graphql.NewNonNull(graphql.String),
+				},
+
+				"purpose": &graphql.ArgumentConfig{
+					Type: graphql.NewNonNull(graphql.String),
+				},
+
+				"emails": &graphql.ArgumentConfig{
+					Type: graphql.NewList(graphql.NewNonNull(graphql.String)),
+				},
+			},
+
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				groupId := p.Args["groupId"].(int)
+				groupName := p.Args["groupName"].(string)
+				purpose := p.Args["purpose"].(string)
+				emailsArg := p.Args["emails"].([]interface{})
+
+				emails := make([]string, len(emailsArg))
+				for i,_ := range emails{
+					emails[i] = emailsArg[i].(string)
+				}
+
+				success := updateGroupInfo(groupId, groupName, purpose, emails)
+				if (success){
+					return true, nil
+				}
+				return false, errors.New("At least a user is invalid. However, valid users were inserted into dbs")
+			},
+
+
+		},
+
 		"deleteUserInGroup": &graphql.Field{
 			Type: graphql.Boolean,
 			Args: graphql.FieldConfigArgument{
