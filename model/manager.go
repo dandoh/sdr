@@ -1,8 +1,17 @@
 package model
 
-import "time"
+import (
+	"time"
+
+)
 
 // User
+func findUserByReportId(reportId int) User{
+	var report Report
+	db.Where("id = ?", reportId).Find(&report)
+	return findUserByID(int(report.UserID))
+}
+
 
 func findAllUsers() (users []User){
 	db.Find(&users)
@@ -84,14 +93,20 @@ func findReportTodayByUserId(userId int) (report Report){
 	return
 }
 
-func findReportYestedayByUserId(userId int)(report Report){
+func findReportYestedayByUserId(userId int)(report Report, isExist bool){
 	yesterday := time.Now().AddDate(0, 0, -1)
 	yesterday = time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(),
 		0,0,0,0,yesterday.Local().Location())
 	day := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(),
 		0,0,0,0,time.Now().Local().Location())
 	print("this is yesterday : ", day.String())
-	db.Where("user_id = ? AND created_at BETWEEN ? AND ?", userId, yesterday, day).First(&report)
+	var count int
+	db.Where("user_id = ? AND created_at BETWEEN ? AND ?", userId, yesterday, day).First(&report).Count(&count)
+	if (count != 0) {
+		isExist = true
+	} else{
+		isExist = false
+	}
 	return
 }
 

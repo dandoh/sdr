@@ -92,7 +92,7 @@ func Init() {
 
 		//////////////////////////////// Today Report 1////////////////////////
 		Todo1_1 := Todo{
-			State:        0, // haven't done yet
+			State:        1, // haven't done yet
 			Content:      faker.Company().Bs(),
 			EstimateTime: 150,
 			SpentTime:    120,

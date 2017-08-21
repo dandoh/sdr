@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/jinzhu/gorm"
 	"github.com/graphql-go/graphql"
+
 )
 
 type Report struct {
@@ -64,25 +65,32 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 
 
 
-func createTodayReportForUser(userId int) int{
+func CreateTodayReportForUser(userId int) int{
 	var report Report = Report{UserID: uint(userId)}
-	yesterdayReport := findReportYestedayByUserId(userId)
-	yesterdayTodoes := findTodoesOfReport(&yesterdayReport)
 	insertReport(&report)
-	for _,todo := range yesterdayTodoes{
-		if todo.State == 0{
-			insertTodo(&Todo{Content: todo.Content, State: todo.State,
-				EstimateTime: todo.EstimateTime, SpentTime: todo.SpentTime, ReportID: report.ID})
-		}
+
+	yesterdayReport, isExist:= findReportYestedayByUserId(userId)
+	//print("This is yesterdayReport", yesterdayReport)
+	if isExist {
+		print("yesterdayReportid:", yesterdayReport.ID)
+			yesterdayTodoes := findTodoesOfReport(&yesterdayReport)
+			for _, todo := range yesterdayTodoes {
+				if todo.State == 0 {
+					insertTodo(&Todo{Content: todo.Content, State: todo.State,
+						EstimateTime:         todo.EstimateTime, SpentTime: todo.SpentTime, ReportID: report.ID})
+				}
+			}
+
 	}
+	saveSubscribe(int(userId), int(report.ID), report.UpdatedAt)
 
 	return  int(report.ID)
 }
 
-func createTodayReportForAllUsers() bool{
+func CreateTodayReportForAllUsers() bool{
 	users := findAllUsers()
 	for _, user := range users{
-		createTodayReportForUser(int(user.ID))
+		CreateTodayReportForUser(int(user.ID))
 	}
 	return true
 }
@@ -91,6 +99,7 @@ func updateNoteOfReport(note string, reportId int) string{
 	report := findReportByID(uint(reportId))
 	report.Note = note
 	saveReport(&report)
+
 	return report.Note
 }
 
