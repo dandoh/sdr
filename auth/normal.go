@@ -100,7 +100,10 @@ func LoginFunc(w http.ResponseWriter, req *http.Request) {
 			Id:        string(userID),
 		},
 	}
+	// put information (claims) to token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+
 	fmt.Println("Chuan bi");
 	fmt.Println(jwtSecret);
 	signedToken, _ := token.SignedString(jwtSecret)

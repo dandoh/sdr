@@ -119,6 +119,11 @@ func getUserCommentLastInReport(reportId int) (user User, isExist bool){
 	return User{}, false
 }
 
+func getLastCommentInReport(reportId int) (comment Comment) {
+	db.Where("report_id = ?", reportId).Last(&comment)
+	return comment
+}
+
 func GetUserID(email string, password string) (uint, bool) {
 	user := findUserByEmail(email);
 	fmt.Printf("Received %s, expected %s", util.GetMD5Hash(password), user.PasswordMD5);

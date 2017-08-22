@@ -53,6 +53,14 @@ var subscribeType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 
+		"lastComment": &graphql.Field{
+			Type: commentType,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				subscribe := p.Source.(Subscribe)
+				return getLastCommentInReport(int(subscribe.ReportId)), nil
+			},
+		},
+
 		"report": &graphql.Field{
 			Type: reportType,
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
