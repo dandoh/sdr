@@ -7,17 +7,15 @@ import (
 	_"fmt"
 
 	"time"
-
 )
 
 type Subscribe struct {
 	gorm.Model
-	UserId       uint `gorm:"index"`
-	ReportId 	 uint `gorm:"index"`
-	LastUpdatedAt time.Time
+	UserId                uint `gorm:"index"`
+	ReportId              uint `gorm:"index"`
+	LastUpdatedAt         time.Time
 	NumberCommentsNotSeen int
 }
-
 
 var subscribeType = graphql.NewObject(graphql.ObjectConfig{
 	Name:        "Subscribe",
@@ -43,19 +41,19 @@ var subscribeType = graphql.NewObject(graphql.ObjectConfig{
 		},
 		*/
 
-		"userCommentLast":&graphql.Field{
+		"lastUser": &graphql.Field{
 			Type: userType,
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				subscribe := p.Source.(Subscribe)
 				user, isExist := getUserCommentLastInReport(int(subscribe.ReportId))
-				if (isExist){
+				if (isExist) {
 					return user, nil
 				}
 				return User{}, nil
 			},
 		},
 
-		"report" : &graphql.Field{
+		"report": &graphql.Field{
 			Type: reportType,
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				subscribe := p.Source.(Subscribe)
@@ -72,7 +70,7 @@ var subscribeType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 
-		"lastUpdatedAt" : &graphql.Field{
+		"lastUpdatedAt": &graphql.Field{
 			Type:        graphql.String,
 			Description: "...",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -82,12 +80,11 @@ var subscribeType = graphql.NewObject(graphql.ObjectConfig{
 		},
 
 
-
 		//Password and Token haven't been declared.
 	},
 })
 
-func getUpdatedSubscribe(userId int, reportId int) Subscribe{
+func getUpdatedSubscribe(userId int, reportId int) Subscribe {
 	var num int
 	subscribe := findSubscribeByIds(userId, reportId)
 	db.Model(&Comment{}).Where("report_id = ? AND updated_at > ?",
@@ -97,4 +94,3 @@ func getUpdatedSubscribe(userId int, reportId int) Subscribe{
 	db.Save(&subscribe)
 	return subscribe
 }
-
