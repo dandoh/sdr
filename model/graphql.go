@@ -120,12 +120,17 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 					Description: "...",
 				},
 
+				"userId": &graphql.ArgumentConfig{
+					Type: graphql.Int,
+					Description: "...",
+				},
+
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				authorContext := p.Context.Value("authorContext").(AuthorContext)
 				fromDate := p.Args["fromDate"].(string)
 				toDate := p.Args["toDate"].(string)
-				reports, err := getOldReportsByUserId(int(authorContext.AuthorID), fromDate, toDate)
+				userId := p.Args["userId"].(int)
+				reports, err := getOldReportsByUserId(userId, fromDate, toDate)
 
 				if err != nil {
 					return nil, errors.New("Date must be in form yyyy-mm-dd")
