@@ -71,8 +71,10 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				authorContext := p.Context.Value("authorContext").(AuthorContext)
 				idQuery, isOK := p.Args["reportId"].(int)
 				if isOK {
+					saveSubscribe(int(authorContext.AuthorID), idQuery, time.Now())
 					return findReportByID(uint(idQuery)), nil
 				}
 
@@ -147,8 +149,9 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				authorContext := p.Context.Value("authorContext").(AuthorContext)
-				return findReportTodayByUserId(int(authorContext.AuthorID)), nil
-
+				report := findReportTodayByUserId(int(authorContext.AuthorID))
+				saveSubscribe(int(authorContext.AuthorID), int(report.ID), time.Now())
+				return report, nil
 				return Report{}, nil
 			},
 

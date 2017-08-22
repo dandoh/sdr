@@ -168,19 +168,22 @@ class TestReport(unittest.TestCase):
         self.assertIsNotNone(res['data'], msg = None)
 
         ##Test get all old reports in (date1, date2)
+        userId1 = 1
         fromDate = "2017-08-16"
         toDate = "2017-08-17"
         get_all_old_reports_in_period="""
         query{
-            oldReports(fromDate: "%s", toDate: "%s"){
+            oldReports(userId: %d, fromDate: "%s", toDate: "%s"){
                 reportId
             }
         }
-        """%(fromDate, toDate)
+        """%(userId1,fromDate, toDate)
 
         res = self.client.send(get_all_old_reports_in_period)
 
-        self.assertTrue(len(res['data']['oldReports']) ==0 )
+
+
+        self.assertTrue(len(res['data']['oldReports']) == 0)
 
 
         ##Change the date
@@ -188,14 +191,15 @@ class TestReport(unittest.TestCase):
 
         get_all_old_reports_in_period="""
         query{
-            oldReports(fromDate: "%s", toDate: "%s"){
+            oldReports(userId: %d , fromDate: "%s", toDate: "%s"){
                 reportId
             }
         }
-        """%(fromDate, toDate)
+        """%(userId1, fromDate, toDate)
 
 
         res = self.client.send(get_all_old_reports_in_period)
+
 
         self.assertFalse(len(res['data']['oldReports']) ==0 )
 
