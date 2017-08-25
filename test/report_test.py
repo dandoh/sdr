@@ -1,5 +1,8 @@
 import unittest
 import client
+import requests
+import http.client
+import json
 from faker import Factory
 
 class TestReport(unittest.TestCase):
@@ -9,7 +12,6 @@ class TestReport(unittest.TestCase):
 
     def test_upper(self):
         self.assertEqual('foo'.upper(), 'FOO')
-
 
     def test_report_todo_comment_note(self):
 
@@ -148,8 +150,6 @@ class TestReport(unittest.TestCase):
         todoIds = [x['todoId'] for x in todoes]
         self.assertFalse(todoId in todoIds)
 
-
-
     def test_reports(self):
 
         ##Test get all reports of user
@@ -221,6 +221,56 @@ class TestReport(unittest.TestCase):
         res = self.client.send(get_reports_to_day_of_group)
         self.assertIsNotNone(res['data'], msg = None)
         #print(res)
+
+    def test_today_report_for_signup_user(self):
+        ##Signup
+        """
+        json = {
+            'username' : 'vietdx',
+            'password' : 'haha',
+            'email' : 'Viet@gmail.com'
+        }
+
+        url = 'http://localhost:8080/signup'
+
+        success = requests.post(url, data = json)
+        print("isSuccess: ", success)
+        """
+        username = "vietdx"
+        email = "Viet@gmail.com"
+        password = "haha"
+        client = http.client.HTTPConnection("localhost:8080")
+        headers = {'Content-type': 'application/json'}
+        sign_up_json = json.dumps({'username': username, 'email': email, 'password': password})
+        client.request('POST', '/signup', sign_up_json, headers)
+
+        ## add created user to group
+        groupId1 = 1
+        add_user_to_group_mutation = """
+        mutation{
+            addUserToGroup(email : "%s", groupId : %d)
+        }
+        """%(email, groupId1)
+
+        res = self.client.send(add_user_to_group_mutation)
+
+        ## Get all todayReport of group
+        get_all_today_reports_of_group_query = """
+        query{
+            reportsTodayOfGroup(groupId : %d){
+                reportId
+                todoes{
+                    content
+                }
+            }
+        }
+        """%(groupId1)
+
+        res = self.client.send(get_all_today_reports_of_group_query)
+
+        self.assertTrue(len(res['data']['reportsTodayOfGroup']) == 4)
+
+
 
 
 
