@@ -56,9 +56,9 @@ func Init() {
 		db.Create(&user2)
 		db.Create(&user3)
 
-		group1 := Group{Name: faker.Company().Name()}
-		group2 := Group{Name: faker.Company().Name()}
-		group3 := Group{Name: faker.Company().Name()}
+		group1 := Group{Name: faker.Company().Name(), Purpose: "Team Building"}
+		group2 := Group{Name: faker.Company().Name(), Purpose: "Learning React Native"}
+		group3 := Group{Name: faker.Company().Name(), Purpose: "Learning Linux"}
 
 		db.Create(&group1)
 		db.Create(&group2)
