@@ -49,3 +49,33 @@ func findGroupsByUserID(id int) (groups []Group) {
 	groups = findGroupsByUser(&user);
 	return
 }
+
+func updateGroupInfo(groupId int, groupName string, purpose string, emails []string) (bool){
+	users := findUsersByGroupID(groupId)
+	for _, user := range users{
+		deleteUserInGroupByEmail(user.Email, groupId)
+	}
+	group := findGroupByID(groupId)
+	group.Name = groupName
+	group.Purpose = purpose
+
+	numNewUser := 0
+	for _, email := range emails {
+		if (!isUserInGroupAlready(email, groupId) && isEmailExisted(email)) {
+			insertUserToGroupByEmail(email, groupId)
+			numNewUser ++
+		}
+	}
+
+	db.Save(&group)
+
+	if (numNewUser == len(emails)) {
+		return true
+	}
+
+	if (numNewUser != 0) {
+		return false
+	}
+
+	return false
+}

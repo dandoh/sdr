@@ -1,6 +1,22 @@
 package model
 
+import (
+	"time"
+
+)
+
 // User
+func findUserByReportId(reportId int) User{
+	var report Report
+	db.Where("id = ?", reportId).Find(&report)
+	return findUserByID(int(report.UserID))
+}
+
+
+func findAllUsers() (users []User){
+	db.Find(&users)
+	return
+}
 func findGroupsContainUser(user *User) (groups []Group) {
 	db.Model(user).Association("Groups").Find(&groups)
 	return
@@ -46,7 +62,55 @@ func findUserByName(name string) (user User) {
 	return
 }
 
+func isUserInGroupAlready(email string, groupId int) bool{
+	var users []User
+	group := findGroupByID(groupId)
+	users = findUsersByGroup(&group)
+	for _, user := range users {
+
+		if user.Email == email {
+			return true
+		}
+	}
+
+	return false
+
+}
+
+
 // Report
+func findOldReportsOfUser(userId int, t1 time.Time, t2 time.Time)(reports []Report){
+	db.Table("reports").Where("user_id = ? AND created_at BETWEEN ? AND ?", userId, t1, t2).Find(&reports)
+	return
+}
+
+
+func findReportTodayByUserId(userId int) (report Report){
+	day := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(),
+		0,0,0,0,time.Now().Local().Location())
+	print("this is day : ", day.String())
+	db.Where("user_id = ? AND created_at > ?", userId, day).Last(&report)
+	return
+}
+
+func findReportYestedayByUserId(userId int)(report Report, isExist bool){
+	yesterday := time.Now().AddDate(0, 0, -1)
+	yesterday = time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(),
+		0,0,0,0,yesterday.Local().Location())
+	day := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(),
+		0,0,0,0,time.Now().Local().Location())
+	print("this is yesterday : ", day.String())
+	var count int
+	db.Where("user_id = ? AND created_at BETWEEN ? AND ?", userId, yesterday, day).First(&report).Count(&count)
+	if (count != 0) {
+		isExist = true
+	} else{
+		isExist = false
+	}
+	return
+}
+
+
 func insertReport(report *Report){
 	db.Create(report)
 	return
@@ -56,6 +120,9 @@ func findTodoesOfReport(report *Report) (todoes []Todo) {
 	db.Model(report).Association("Todoes").Find(&todoes)
 	return
 }
+
+
+
 
 func findCommentsOfReport(report *Report) (comments []Comment) {
 	db.Model(report).Association("Comments").Find(&comments)
@@ -72,8 +139,7 @@ func findReportByID(id uint) (report Report) {
 	return
 }
 
-func updateNoteOfReport(note string, report *Report){
-	report.Note = note
+func saveReport(report *Report){
 	db.Save(report)
 }
 
@@ -84,6 +150,24 @@ func deleteTodoesOfReport(report *Report){
 		db.Model(report).Association("Todoes").Delete(todo)
 	}
 	return
+}
+
+func deleteTodo(todoId int) bool{
+
+	todo := findTodoById(todoId)
+	report := findReportByID(uint(todo.ReportID))
+	db.Model(report).Association("Todoes").Delete(todo)
+	return true
+}
+
+func updateTodo(todoId int, content string, state int, estimateTime int, spentTime int) bool{
+	todo := findTodoById(todoId)
+	todo.Content = content
+	todo.State = state
+	todo.EstimateTime = estimateTime
+	todo.SpentTime = spentTime
+	db.Save(todo)
+	return true
 }
 
 
@@ -108,8 +192,10 @@ func isNameGroupExisted(name string) bool {
 	return false
 }
 
-func insertGroup(name string, purpose string) {
-	db.Create(&Group{Name: name, Purpose: purpose})
+func insertGroup(name string, purpose string) uint {
+	var group Group = Group{Name: name, Purpose: purpose}
+	db.Create(&group)
+	return group.ID
 }
 
 func findGroupByName(name string) (group Group) {
@@ -134,5 +220,37 @@ func insertComment(comment *Comment) {
 
 func insertTodo(todo *Todo){
 	db.Create(todo)
+	return
+}
+
+//Todo
+
+func findTodoById(todoId int) (todo Todo){
+	db.Where("id = ?", todoId).First(&todo)
+	return
+}
+
+//Subscribe
+func findSubscribeByIds(userId int, reportId int)(subscribe Subscribe){
+	db.Where("user_id = ? AND report_id = ?", userId, reportId).First(&subscribe)
+	return
+}
+
+func saveSubscribe(userId int, reportId int, lastUpdatedAt time.Time) bool{
+	var subscribe Subscribe
+	var count int
+	db.Where("user_id = ?  AND report_id = ?", userId, reportId).Find(&subscribe).Count(&count)
+	if (count != 0) {
+		subscribe.LastUpdatedAt = lastUpdatedAt
+		subscribe.NumberCommentsNotSeen = 0
+		db.Save(&subscribe)
+	} else {
+		db.Create(&Subscribe{UserId: uint(userId), ReportId: uint(reportId), NumberCommentsNotSeen: 0, LastUpdatedAt:lastUpdatedAt})
+	}
+	return true
+}
+
+func findSubscribesOfUser(userId int) (subscribe []Subscribe){
+	db.Where("user_id = ?", userId).Find(&subscribe)
 	return
 }

@@ -43,8 +43,6 @@ func GraphqlHandlerFunc() http.HandlerFunc {
 	}
 }
 
-
 func AppHandler() http.Handler {
 	return auth.RequireAuth(http.HandlerFunc(GraphqlHandlerFunc()))
 }
-

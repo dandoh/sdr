@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/jinzhu/gorm"
 	"github.com/graphql-go/graphql"
+
 )
 
 type Report struct {
@@ -11,6 +12,7 @@ type Report struct {
 	UserID   uint `gorm:"index"`
 	Todoes   []Todo
 	Comments []Comment
+	Subscribes []Subscribe
 }
 
 var reportType = graphql.NewObject(graphql.ObjectConfig{
@@ -56,35 +58,69 @@ var reportType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 
+		"createdAt" : &graphql.Field{
+			Type:        graphql.String,
+			Description: "...",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				report := p.Source.(Report)
+				return report.CreatedAt.String(), nil
+			},
+		},
+
 	},
 
 
 })
 
-func createReport(todoes []Todo, userId int) {
-	var report Report = Report{UserID: uint(userId)} // TODO - fix this later
+
+
+func CreateTodayReportForUser(userId int) int{
+	var report Report = Report{UserID: uint(userId)}
 	insertReport(&report)
 
-	for _, todo := range todoes {
-		todo.ReportID = report.ID
-		insertTodo(&todo)
+	yesterdayReport, isExist:= findReportYestedayByUserId(userId)
+	//print("This is yesterdayReport", yesterdayReport)
+	if isExist {
+		print("yesterdayReportid:", yesterdayReport.ID)
+			yesterdayTodoes := findTodoesOfReport(&yesterdayReport)
+			for _, todo := range yesterdayTodoes {
+				if todo.State == 0 {
+					insertTodo(&Todo{Content: todo.Content, State: todo.State,
+						EstimateTime:         todo.EstimateTime, SpentTime: todo.SpentTime, ReportID: report.ID})
+				}
+			}
+
 	}
-	return
+	saveSubscribe(int(userId), int(report.ID), report.UpdatedAt)
+
+	return  int(report.ID)
 }
 
-func updateReport(reportId int, todoes []Todo, note string) {
+func CreateTodayReportForAllUsers() bool{
+	users := findAllUsers()
+	for _, user := range users{
+		CreateTodayReportForUser(int(user.ID))
+	}
+	return true
+}
+
+func updateNoteOfReport(note string, reportId int) string{
 	report := findReportByID(uint(reportId))
-	updateNoteOfReport(note, &report)
+	report.Note = note
+	saveReport(&report)
 
-	//Delete old to-do list
-	deleteTodoesOfReport(&report)
-
-	//Create new to-do list
-	for _, todo := range todoes {
-		todo.ReportID = uint(reportId)
-		insertTodo(&todo)
-	}
-	return
+	return report.Note
 }
 
+func getAllReportsTodayByGroupId(groupId int) (reports []Report){
+	users := findUsersByGroupID(groupId)
+	for _, user := range users{
+		 reportToday := findReportTodayByUserId(int(user.ID))
+		if reportToday.ID != 0{
+			reports = append(reports, reportToday)
+		}
+	}
+
+	return
+}
 

@@ -10,10 +10,11 @@ import (
 	"github.com/dandoh/sdr/model"
 	"time"
 	"os"
+	"github.com/enodata/faker"
 )
 
 type LoginRequest struct {
-	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -24,18 +25,20 @@ type SignupRequest struct {
 }
 
 func confirmLogin(requestbody LoginRequest) (uint, bool) {
-	username := requestbody.Username
+	email := requestbody.Email
 	password := requestbody.Password
-	return model.GetUserID(username, password)
+	return model.GetUserID(email, password)
 }
 
 func confirmSignUp(requestbody SignupRequest) bool {
 	username := requestbody.Username
 	password := requestbody.Password
 	email := requestbody.Email
-	if (model.IsUserExisted(username, email) == false) {
-		var user model.User = model.User{Name: username, PasswordMD5: util.GetMD5Hash(password), Email: email}
+	if !model.IsUserExisted(username, email) {
+		avatar := faker.Avatar().String()
+		var user model.User = model.User{Name: username, PasswordMD5: util.GetMD5Hash(password), Email: email, Avatar: avatar}
 		model.CreateUser(&user)
+		model.CreateTodayReportForUser(int(user.ID))
 		return true
 	}
 	return false
@@ -91,14 +94,17 @@ func LoginFunc(w http.ResponseWriter, req *http.Request) {
 
 	claims := Claims{
 		userID,
-		requestBody.Username,
+		requestBody.Email,
 		jwt.StandardClaims{
 			ExpiresAt: expireToken,
 			Issuer:    "localhost:8080",
 			Id:        string(userID),
 		},
 	}
+	// put information (claims) to token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+
 	fmt.Println("Chuan bi");
 	fmt.Println(jwtSecret);
 	signedToken, _ := token.SignedString(jwtSecret)

@@ -34,14 +34,24 @@ var commentType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 
+		"createdAt": &graphql.Field{
+			Type:        graphql.String,
+			Description: "...",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				comment := p.Source.(Comment)
+				return comment.CreatedAt.String(), nil
+			},
+		},
+
 
 	},
 
 
 })
 
-func createComment(content string, userID uint, reportID uint) bool {
+func createComment(content string, userID uint, reportID uint) int {
 	comment := Comment{Content: content, UserID: userID, ReportID: reportID}
 	insertComment(&comment)
-	return true
+	saveSubscribe(int(userID), int(reportID), comment.UpdatedAt)
+	return int(comment.ID)
 }

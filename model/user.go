@@ -5,6 +5,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/graphql-go/graphql"
 	"fmt"
+	"time"
 )
 
 type User struct {
@@ -12,11 +13,11 @@ type User struct {
 	Name        string `gorm:"size:255; unique"`
 	PasswordMD5 string `gorm:"size:255"`
 	Email       string `gorm:"not null; unique"`
-	Token       string
-	Note        string    `gorm:"size:2000"`
+	Avatar      string
 	Groups      []Group `gorm:"many2many:user_group"`
 	Reports     []Report
 	Comments    []Comment
+	Subscribes []Subscribe
 }
 
 var userType = graphql.NewObject(graphql.ObjectConfig{
@@ -49,6 +50,15 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 
 		},
 
+		"avatar": &graphql.Field{
+			Type:        graphql.String,
+			Description: "...",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				user := p.Source.(User)
+				return user.Avatar, nil
+			},
+		},
+/*
 		"note": &graphql.Field{
 			Type:        graphql.String,
 			Description: "...",
@@ -57,7 +67,7 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 				return user.Note, nil
 			},
 		},
-
+*/
 
 		"groups": &graphql.Field{
 			Type:        graphql.NewList(groupType),
@@ -85,12 +95,37 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 				return findCommentsOfUser(&user), nil
 			},
 		},
+
+		"todayReport": &graphql.Field{
+			Type:        reportType,
+			Description: "....",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				user := p.Source.(User)
+				return findReportTodayByUserId(int(user.ID)), nil
+			},
+		},
 		//Password and Token haven't been declared.
 	},
 })
 
-func GetUserID(username string, password string) (uint, bool) {
-	user := findUserByName(username);
+
+func getUserCommentLastInReport(reportId int) (user User, isExist bool){
+	var comment Comment
+	var count int
+	db.Where("report_id = ?", reportId).Last(&comment).Count(&count)
+	if count != 0{
+		return findUserByID(int(comment.UserID)), true
+	}
+	return User{}, false
+}
+
+func getLastCommentInReport(reportId int) (comment Comment) {
+	db.Where("report_id = ?", reportId).Last(&comment)
+	return comment
+}
+
+func GetUserID(email string, password string) (uint, bool) {
+	user := findUserByEmail(email);
 	fmt.Printf("Received %s, expected %s", util.GetMD5Hash(password), user.PasswordMD5);
 	if user.PasswordMD5 == util.GetMD5Hash(password) {
 		return user.ID, true
@@ -111,9 +146,9 @@ func insertUserToGroupByEmail(email string, groupID int) bool {
 	return true
 }
 
-func insertUserToGroupByID(userID int, groupName string) bool {
+func insertUserToGroupByID(userID int, groupID int) bool {
 	user := findUserByID(userID)
-	group := findGroupByName(groupName)
+	group := findGroupByID(groupID)
 	insertUserToGroup(&user, &group);
 	return true
 }
@@ -139,7 +174,50 @@ func IsUserExisted(name string, email string) bool {
 	return false
 }
 
+func isEmailExisted(email string) bool {
+	var user User
+	var count int
+	db.Where("email = ?", email).Find(&user).Count(&count)
+	if count > 0 {
+		return true
+	}
+	return false
+}
+
+
 func CreateUser(user *User){
 	db.Create(user)
+	return
+}
+
+func getAllReportsOfUser(userId int) (reports []Report){
+	user := findUserByID(userId)
+	return findReportsOfUser(&user)
+}
+
+func getOldReportsByUserId(userId int, fromDate string, toDate string) (reports []Report, err error){
+	t1, err1 := time.Parse("2006-01-02", fromDate)
+	t2, err2 := time.Parse("2006-01-02", toDate)
+
+	if err1 != nil{
+		return nil, err1
+	}
+
+	if err2 != nil {
+		return nil, err2
+	}
+
+
+	return findOldReportsOfUser(userId, t1, t2), nil
+}
+
+func getAllSubscribesOfUser(userId int) (out []Subscribe){
+	subscribes := findSubscribesOfUser(userId)
+	for _,subscribe := range subscribes{
+		updatedSubscribe := getUpdatedSubscribe(int(subscribe.UserId), int(subscribe.ReportId))
+		if updatedSubscribe.NumberCommentsNotSeen != 0{
+			out = append(out, updatedSubscribe)
+		}
+	}
 	return
 }
